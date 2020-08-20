@@ -22,7 +22,9 @@
         "main": [
             "net.teamhollow.soulstriders.SoulStriders"
         ],
-        "client": [],
+        "client": [
+            "net.teamhollow.soulstriders.SoulStridersClient"
+        ],
         "server": []
     },
     "mixins": [],
