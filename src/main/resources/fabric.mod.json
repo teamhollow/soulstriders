@@ -1,0 +1,33 @@
+{
+    "schemaVersion": 1,
+    "license": "MIT",
+    "id": "soulstriders",
+    "version": "${version}",
+
+    "name": "Soul Striders",
+    "description": "Description",
+    "icon": "pack.png",
+
+    "authors": [
+        "Team Hollow"
+    ],
+    "contributors": [],
+    "contact": {
+        "homepage": "https://soulstriders.teamhollow.net",
+        "sources": "https://github.com/teamhollow/soulstriders"
+    },
+
+    "environment": "*",
+    "entrypoints": {
+        "main": [
+            "net.teamhollow.soulstriders.SoulStriders"
+        ],
+        "client": [],
+        "server": []
+    },
+    "mixins": [],
+    "depends": {
+        "fabricloader": ">=0.9.2",
+        "fabric": "*"
+    }
+}
