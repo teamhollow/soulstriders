@@ -81,7 +81,7 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
     private static final Ingredient BREEDING_INGREDIENT;
     private static final Ingredient ATTRACTING_INGREDIENT;
     private static final TrackedData<Integer> BOOST_TIME;
-    private static final TrackedData<Boolean> COLD;
+    private static final TrackedData<Boolean> SOUL_SURROUNDED;
     private static final TrackedData<Boolean> SADDLED;
     private final SaddledComponent saddledComponent;
     private TemptGoal temptGoal;
@@ -93,8 +93,8 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
         this.inanimate = true;
         this.setPathfindingPenalty(PathNodeType.WATER, -1.0F);
         this.setPathfindingPenalty(PathNodeType.LAVA, -1.0F);
-        this.setPathfindingPenalty(PathNodeType.DANGER_FIRE, 0.0F);
-        this.setPathfindingPenalty(PathNodeType.DAMAGE_FIRE, 0.0F);
+        this.setPathfindingPenalty(PathNodeType.DANGER_FIRE, -1.0F);
+        this.setPathfindingPenalty(PathNodeType.DAMAGE_FIRE, -1.0F);
     }
 
     public static boolean canSpawn(EntityType<SoulStriderEntity> type, WorldAccess worldAccess, SpawnReason spawnReason, BlockPos blockPos, Random random) {
@@ -120,7 +120,7 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
     protected void initDataTracker() {
         super.initDataTracker();
         this.dataTracker.startTracking(BOOST_TIME, 0);
-        this.dataTracker.startTracking(COLD, true);
+        this.dataTracker.startTracking(SOUL_SURROUNDED, true);
         this.dataTracker.startTracking(SADDLED, false);
     }
 
@@ -169,12 +169,12 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
         this.goalSelector.add(9, new LookAtEntityGoal(this, SoulStriderEntity.class, 8.0F));
     }
 
-    public void setCold(boolean cold) {
-        this.dataTracker.set(COLD, cold);
+    public void setSoulSurrounded(boolean soulSurrounded) {
+        this.dataTracker.set(SOUL_SURROUNDED, soulSurrounded);
     }
 
-    public boolean isCold() {
-        return this.getVehicle() instanceof SoulStriderEntity ? ((SoulStriderEntity) this.getVehicle()).isCold() : (Boolean) this.dataTracker.get(COLD);
+    public boolean isSoulSurrounded() {
+        return this.getVehicle() instanceof SoulStriderEntity ? ((SoulStriderEntity) this.getVehicle()).isSoulSurrounded() : (Boolean) this.dataTracker.get(SOUL_SURROUNDED);
     }
 
     @Override
@@ -284,13 +284,13 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
     }
 
     public float getSpeed() {
-        return (float) this.getAttributeValue(EntityAttributes.GENERIC_MOVEMENT_SPEED) * (!this.isCold() ? 0.66F : 1.0F);
+        return (float) this.getAttributeValue(EntityAttributes.GENERIC_MOVEMENT_SPEED) * (!this.isSoulSurrounded() ? 0.66F : 1.0F);
     }
 
     @Override
     public float getSaddledSpeed() {
         return (float) this.getAttributeValue(EntityAttributes.GENERIC_MOVEMENT_SPEED)
-                * (!this.isCold() ? 0.23F : 0.55F);
+                * (!this.isSoulSurrounded() ? 0.23F : 0.55F);
     }
 
     @Override
@@ -340,7 +340,7 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
             this.playSound(SoundEvents.ENTITY_STRIDER_RETREAT, 1.0F, this.getSoundPitch());
         }
 
-        this.setCold(isNearSouls());
+        this.setSoulSurrounded(isNearSouls());
         super.tick();
         this.checkBlockCollision();
     }
@@ -502,7 +502,7 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
         BREEDING_INGREDIENT = Ingredient.ofItems(Items.SOUL_SOIL);
         ATTRACTING_INGREDIENT = Ingredient.ofItems(Items.SOUL_SOIL, Items.WARPED_FUNGUS_ON_A_STICK);
         BOOST_TIME = DataTracker.registerData(SoulStriderEntity.class, TrackedDataHandlerRegistry.INTEGER);
-        COLD = DataTracker.registerData(SoulStriderEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+        SOUL_SURROUNDED = DataTracker.registerData(SoulStriderEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
         SADDLED = DataTracker.registerData(SoulStriderEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     }
 

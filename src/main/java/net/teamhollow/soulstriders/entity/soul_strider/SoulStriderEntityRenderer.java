@@ -12,7 +12,7 @@ import net.teamhollow.soulstriders.init.SSEntities;
 @Environment(EnvType.CLIENT)
 public class SoulStriderEntityRenderer extends MobEntityRenderer<SoulStriderEntity, SoulStriderEntityModel<SoulStriderEntity>> {
     private static final Identifier TEXTURE = SSEntities.texture("soul_strider/soul_strider");
-    private static final Identifier WARM_TEXTURE = SSEntities.texture("soul_strider/soul_strider_warm");
+    private static final Identifier SOULLESS_TEXTURE = SSEntities.texture("soul_strider/soul_strider_soulless");
 
     public SoulStriderEntityRenderer(EntityRenderDispatcher entityRenderDispatcher) {
         super(entityRenderDispatcher, new SoulStriderEntityModel<SoulStriderEntity>(), 0.5F);
@@ -27,7 +27,7 @@ public class SoulStriderEntityRenderer extends MobEntityRenderer<SoulStriderEnti
 
     @Override
     public Identifier getTexture(SoulStriderEntity soulStriderEntity) {
-        return !soulStriderEntity.isCold() ? WARM_TEXTURE : TEXTURE;
+        return !soulStriderEntity.isSoulSurrounded() ? SOULLESS_TEXTURE : TEXTURE;
     }
 
     @Override
