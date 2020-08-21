@@ -37,7 +37,7 @@ public class SoulStriders implements ModInitializer {
         log(Level.INFO, message);
     }
 
-	public static Identifier texture(String string) {
-		return null;
+	public static Identifier texture(String path) {
+		return new Identifier(MOD_ID, "textures/" + path + ".png");
 	}
 }
