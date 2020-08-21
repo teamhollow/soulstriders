@@ -10,8 +10,8 @@ import net.minecraft.entity.ai.goal.FollowTargetGoal;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.mob.AmbientEntity;
 import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
@@ -20,7 +20,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.teamhollow.soulstriders.entity.soul_strider.SoulStriderEntity;
 
-public class WispEntity extends AmbientEntity {
+public class WispEntity extends PassiveEntity {
     public static final String id = "wisp";
     public static final EntityType.Builder<WispEntity> builder = EntityType.Builder
         .create(WispEntity::new, SpawnGroup.AMBIENT)
@@ -125,5 +125,10 @@ public class WispEntity extends AmbientEntity {
     @Override
     protected float getActiveEyeHeight(EntityPose pose, EntityDimensions dimensions) {
         return dimensions.height / 2.0F;
+    }
+
+    @Override
+    public PassiveEntity createChild(PassiveEntity mate) {
+        return null;
     }
 }

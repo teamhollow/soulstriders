@@ -9,6 +9,7 @@ import com.google.common.collect.UnmodifiableIterator;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Dismounting;
@@ -17,6 +18,7 @@ import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.ItemSteerable;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.Saddleable;
@@ -53,9 +55,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.recipe.Ingredient;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.stat.Stats;
 import net.minecraft.tag.BlockTags;
 import net.minecraft.tag.FluidTags;
 import net.minecraft.util.ActionResult;
@@ -65,6 +69,7 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.GameRules;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
@@ -423,8 +428,29 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
     }
 
     @Override
-    public SoulStriderEntity createChild(PassiveEntity passiveEntity) {
-        return SSEntities.SOUL_STRIDER.create(this.world);
+    public void breed(World world, AnimalEntity other) {
+        PassiveEntity wisp = SSEntities.WISP.create(world);
+        if (wisp != null) {
+            ServerPlayerEntity serverPlayerEntity = this.getLovingPlayer();
+            if (serverPlayerEntity == null && other.getLovingPlayer() != null) {
+                serverPlayerEntity = other.getLovingPlayer();
+            }
+
+            if (serverPlayerEntity != null) {
+                serverPlayerEntity.incrementStat(Stats.ANIMALS_BRED);
+                Criteria.BRED_ANIMALS.trigger(serverPlayerEntity, this, other, wisp);
+            }
+
+            this.setBreedingAge(6000);
+            other.setBreedingAge(6000);
+            this.resetLoveTicks();
+            other.resetLoveTicks();
+            wisp.refreshPositionAndAngles(this.getX(), this.getY(), this.getZ(), 0.0F, 0.0F);
+            world.spawnEntity(wisp);
+            world.sendEntityStatus(this, (byte) 18);
+            if (world.getGameRules().getBoolean(GameRules.DO_MOB_LOOT))
+                world.spawnEntity(new ExperienceOrbEntity(world, this.getX(), this.getY(), this.getZ(), this.getRandom().nextInt(7) + 1));
+        }
     }
 
     @Override
@@ -563,5 +589,10 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
         public static enum RiderType {
             NO_RIDER, BABY_RIDER, PIGLIN_RIDER;
         }
+    }
+
+    @Override
+    public PassiveEntity createChild(PassiveEntity mate) {
+        return null;
     }
 }
