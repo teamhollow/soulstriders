@@ -349,7 +349,7 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
     protected void mobTick() {
         super.mobTick();
 
-        boolean isHideSafe = !isTempting() && this.world.getClosestPlayer(CLOSE_PLAYER_PREDICATE, this) == null && this.getPassengerList().size() == 0 && this.isOnSoulBlock(this.getBlockPos());
+        boolean isHideSafe = !isBaby() && !isTempting() && this.world.getClosestPlayer(CLOSE_PLAYER_PREDICATE, this) == null && this.getPassengerList().size() == 0 && this.isOnSoulBlock(this.getBlockPos());
         if (this.isHiding() && !isHideSafe) this.setHiding(false);
             else if (this.random.nextInt(100) == 0 && isHideSafe) this.setHiding(true);
     }
