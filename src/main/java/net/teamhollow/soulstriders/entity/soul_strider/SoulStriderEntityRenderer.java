@@ -26,14 +26,14 @@ public class SoulStriderEntityRenderer extends MobEntityRenderer<SoulStriderEnti
     }
 
     @Override
-    public Identifier getTexture(SoulStriderEntity soulStriderEntity) {
-        return !soulStriderEntity.isSoulSurrounded() ? SOULLESS_TEXTURE : TEXTURE;
+    public Identifier getTexture(SoulStriderEntity entity) {
+        return !entity.isSoulSurrounded() ? SOULLESS_TEXTURE : TEXTURE;
     }
 
     @Override
-    protected void scale(SoulStriderEntity soulStriderEntity, MatrixStack matrixStack, float amount) {
+    protected void scale(SoulStriderEntity entity, MatrixStack matrixStack, float amount) {
         float scale = 0.9375F;
-        if (soulStriderEntity.isBaby()) {
+        if (entity.isBaby()) {
             scale *= 0.5F;
             this.shadowRadius = 0.25F;
         } else {
@@ -41,5 +41,11 @@ public class SoulStriderEntityRenderer extends MobEntityRenderer<SoulStriderEnti
         }
 
         matrixStack.scale(scale, scale, scale);
+    }
+
+    @Override
+    protected void setupTransforms(SoulStriderEntity entity, MatrixStack matrices, float animationProgress, float bodyYaw, float tickDelta) {
+        if (entity.isHiding()) matrices.translate(0.0D, -1.08D, 0.0D);
+        super.setupTransforms(entity, matrices, animationProgress, bodyYaw, tickDelta);
     }
 }

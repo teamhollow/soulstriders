@@ -14,6 +14,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.entity.Dismounting;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityData;
+import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ItemSteerable;
@@ -22,6 +23,7 @@ import net.minecraft.entity.Saddleable;
 import net.minecraft.entity.SaddledComponent;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.entity.SpawnReason;
+import net.minecraft.entity.ai.TargetPredicate;
 import net.minecraft.entity.ai.goal.AnimalMateGoal;
 import net.minecraft.entity.ai.goal.EscapeDangerGoal;
 import net.minecraft.entity.ai.goal.FollowParentGoal;
@@ -82,8 +84,10 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
     private static final Ingredient ATTRACTING_INGREDIENT;
     private static final TrackedData<Integer> BOOST_TIME;
     private static final TrackedData<Boolean> SOUL_SURROUNDED;
+    private static final TrackedData<Boolean> HIDING;
     private static final TrackedData<Boolean> SADDLED;
     private final SaddledComponent saddledComponent;
+    private static final TargetPredicate CLOSE_PLAYER_PREDICATE;
     private TemptGoal temptGoal;
     private EscapeDangerGoal escapeDangerGoal;
 
@@ -121,6 +125,7 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
         super.initDataTracker();
         this.dataTracker.startTracking(BOOST_TIME, 0);
         this.dataTracker.startTracking(SOUL_SURROUNDED, true);
+        this.dataTracker.startTracking(HIDING, false);
         this.dataTracker.startTracking(SADDLED, false);
     }
 
@@ -128,12 +133,14 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
     public void writeCustomDataToTag(CompoundTag tag) {
         super.writeCustomDataToTag(tag);
         this.saddledComponent.toTag(tag);
+        tag.putBoolean("Hiding", this.isHiding());
     }
 
     @Override
     public void readCustomDataFromTag(CompoundTag tag) {
         super.readCustomDataFromTag(tag);
         this.saddledComponent.fromTag(tag);
+        this.setHiding(tag.getBoolean("Hiding"));
     }
 
     @Override
@@ -172,9 +179,8 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
     public void setSoulSurrounded(boolean soulSurrounded) {
         this.dataTracker.set(SOUL_SURROUNDED, soulSurrounded);
     }
-
     public boolean isSoulSurrounded() {
-        return this.getVehicle() instanceof SoulStriderEntity ? ((SoulStriderEntity) this.getVehicle()).isSoulSurrounded() : (Boolean) this.dataTracker.get(SOUL_SURROUNDED);
+        return this.getVehicle() instanceof SoulStriderEntity ? ((SoulStriderEntity) this.getVehicle()).isSoulSurrounded() : this.dataTracker.get(SOUL_SURROUNDED);
     }
 
     @Override
@@ -279,7 +285,7 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
 
     @Override
     public void travel(Vec3d movementInput) {
-        this.setMovementSpeed(this.getSpeed());
+        this.setMovementSpeed(this.isHiding() ? 0 : this.getSpeed());
         this.travel(this, this.saddledComponent, movementInput);
     }
 
@@ -289,8 +295,7 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
 
     @Override
     public float getSaddledSpeed() {
-        return (float) this.getAttributeValue(EntityAttributes.GENERIC_MOVEMENT_SPEED)
-                * (!this.isSoulSurrounded() ? 0.23F : 0.55F);
+        return (float) this.getAttributeValue(EntityAttributes.GENERIC_MOVEMENT_SPEED) * (!this.isSoulSurrounded() ? 0.23F : 0.55F);
     }
 
     @Override
@@ -314,22 +319,17 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
     }
 
     @Override
-    protected void fall(double heightDifference, boolean onGround, BlockState landedState, BlockPos landedPosition) {
-        this.checkBlockCollision();
-        if (this.isNearSouls()) {
-            this.fallDistance = 0.0F;
-        } else {
-            super.fall(heightDifference, onGround, landedState, landedPosition);
-        }
-    }
-
-    protected boolean isOnSoulSpeedBlock() {
-        return isNearSouls();
+    protected float getVelocityMultiplier() {
+        return this.isNearSouls() ? 1.0F : super.getVelocityMultiplier();
     }
 
     public boolean isNearSouls() {
         BlockPos pos = this.getBlockPos();
-        return this.world.getBlockState(pos).isIn(BlockTags.SOUL_SPEED_BLOCKS) || this.world.getBlockState(pos.down()).isIn(BlockTags.SOUL_SPEED_BLOCKS) || this.world.getBiome(pos) == Biomes.SOUL_SAND_VALLEY;
+        return this.isOnSoulBlock(pos) || this.world.getBiome(pos) == Biomes.SOUL_SAND_VALLEY;
+    }
+
+    public boolean isOnSoulBlock(BlockPos pos) {
+        return this.world.getBlockState(pos).isIn(BlockTags.SOUL_SPEED_BLOCKS) || this.world.getBlockState(pos.down()).isIn(BlockTags.SOUL_SPEED_BLOCKS);
     }
 
     @Override
@@ -343,6 +343,29 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
         this.setSoulSurrounded(isNearSouls());
         super.tick();
         this.checkBlockCollision();
+    }
+
+    @Override
+    protected void mobTick() {
+        super.mobTick();
+
+        boolean isHideSafe = !isTempting() && this.world.getClosestPlayer(CLOSE_PLAYER_PREDICATE, this) == null && this.getPassengerList().size() == 0 && this.isOnSoulBlock(this.getBlockPos());
+        if (this.isHiding() && !isHideSafe) this.setHiding(false);
+            else if (this.random.nextInt(100) == 0 && isHideSafe) this.setHiding(true);
+    }
+
+    public boolean isHiding() {
+        return this.dataTracker.get(HIDING);
+    }
+    public void setHiding(boolean hiding) {
+        this.dataTracker.set(HIDING, hiding);
+        this.calculateDimensions();
+    }
+
+    @Override
+    public EntityDimensions getDimensions(EntityPose pose) {
+        EntityDimensions entityDimensions = super.getDimensions(pose);
+        return !isHiding() ? entityDimensions : EntityDimensions.fixed(entityDimensions.width, entityDimensions.height - (float) 1.08D);
     }
 
     private boolean isEscapingDanger() {
@@ -503,7 +526,9 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
         ATTRACTING_INGREDIENT = Ingredient.ofItems(Items.SOUL_SOIL, Items.WARPED_FUNGUS_ON_A_STICK);
         BOOST_TIME = DataTracker.registerData(SoulStriderEntity.class, TrackedDataHandlerRegistry.INTEGER);
         SOUL_SURROUNDED = DataTracker.registerData(SoulStriderEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+        HIDING = DataTracker.registerData(SoulStriderEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
         SADDLED = DataTracker.registerData(SoulStriderEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+        CLOSE_PLAYER_PREDICATE = new TargetPredicate().setBaseMaxDistance(8.0D).includeTeammates();
     }
 
     static class Navigation extends MobNavigation {
