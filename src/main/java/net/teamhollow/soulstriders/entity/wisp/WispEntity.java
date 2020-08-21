@@ -24,7 +24,7 @@ public class WispEntity extends AmbientEntity {
     public static final String id = "wisp";
     public static final EntityType.Builder<WispEntity> builder = EntityType.Builder
         .create(WispEntity::new, SpawnGroup.AMBIENT)
-        .setDimensions(0.5F, 0.9F)
+        .setDimensions(0.5F, 0.5F)
         .maxTrackingRange(5);
     public static final int[] spawnEggColors = { 10236982, 5065037 };
 
