@@ -12,6 +12,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import net.teamhollow.soulstriders.SoulStriders;
 import net.teamhollow.soulstriders.entity.soul_strider.*;
+import net.teamhollow.soulstriders.entity.wisp.*;
 
 public class SSEntities {
     public static final EntityType<SoulStriderEntity> SOUL_STRIDER = register(
@@ -19,9 +20,15 @@ public class SSEntities {
         SoulStriderEntity.builder,
         SoulStriderEntity.spawnEggColors
     );
+    public static final EntityType<WispEntity> WISP = register(
+        WispEntity.id,
+        WispEntity.builder,
+        WispEntity.spawnEggColors
+    );
 
     public SSEntities() {
         registerDefaultAttributes(SOUL_STRIDER, SoulStriderEntity.createStriderAttributes());
+        registerDefaultAttributes(WISP, WispEntity.createWispAttributes());
     }
 
     public static void registerRenderers() {
@@ -30,6 +37,10 @@ public class SSEntities {
         INSTANCE.register(
             SOUL_STRIDER,
             (entityRenderDispatcher, context) -> new SoulStriderEntityRenderer(entityRenderDispatcher)
+        );
+        INSTANCE.register(
+            WISP,
+            (entityRenderDispatcher, context) -> new WispEntityRenderer(entityRenderDispatcher)
         );
     }
 

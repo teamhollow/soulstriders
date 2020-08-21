@@ -3,6 +3,8 @@
     "itemGroup.soulstriders.item_group": "Soul Striders",
 
     "entity.soulstriders.soul_strider": "Soul Strider",
+    "entity.soulstriders.wisp": "Wisp",
 
-    "item.soulstriders.soul_strider_spawn_egg": "Soul Strider Spawn Egg"
+    "item.soulstriders.soul_strider_spawn_egg": "Soul Strider Spawn Egg",
+    "item.soulstriders.wisp_spawn_egg": "Wisp Spawn Egg"
 }
