@@ -62,8 +62,9 @@ public class SoulStriderEntityModel<T extends SoulStriderEntity> extends Composi
             this.head.yaw = 0.0F;
         }
 
-        if (entity.isHiding()) lure.pitch = -2.0F;
-            else lure.pitch = -0.6981F;
+        boolean hasBulb = entity.hasBulb();
+        bulb.visible = hasBulb;
+        lure.pitch = hasBulb ? -0.6981F : 0;
 
         this.head.roll = 0.1F * MathHelper.sin(limbSwing * 1.5F) * 4.0F * limbSwingAmount;
         this.head.pivotY = 2.0F;

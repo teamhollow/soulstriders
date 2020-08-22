@@ -90,6 +90,7 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
     private static final TrackedData<Integer> BOOST_TIME;
     private static final TrackedData<Boolean> SOUL_SURROUNDED;
     private static final TrackedData<Boolean> HIDING;
+    private static final TrackedData<Integer> NO_BULB_TICKS;
     private static final TrackedData<Boolean> SADDLED;
     private final SaddledComponent saddledComponent;
     private static final TargetPredicate CLOSE_PLAYER_PREDICATE;
@@ -131,6 +132,7 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
         this.dataTracker.startTracking(BOOST_TIME, 0);
         this.dataTracker.startTracking(SOUL_SURROUNDED, true);
         this.dataTracker.startTracking(HIDING, false);
+        this.dataTracker.startTracking(NO_BULB_TICKS, 0);
         this.dataTracker.startTracking(SADDLED, false);
     }
 
@@ -139,6 +141,7 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
         super.writeCustomDataToTag(tag);
         this.saddledComponent.toTag(tag);
         tag.putBoolean("Hiding", this.isHiding());
+        tag.putInt("NoBulbTicks", this.getNoBulbTicks());
     }
 
     @Override
@@ -146,6 +149,7 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
         super.readCustomDataFromTag(tag);
         this.saddledComponent.fromTag(tag);
         this.setHiding(tag.getBoolean("Hiding"));
+        this.setNoBulbTicks(tag.getInt("NoBulbTicks"));
     }
 
     @Override
@@ -354,6 +358,17 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
     protected void mobTick() {
         super.mobTick();
 
+        if (this.isAlive()) {
+            int noBulbTicks = this.getNoBulbTicks();
+            if (noBulbTicks < 0) {
+                noBulbTicks ++;
+                this.setNoBulbTicks(noBulbTicks);
+            } else if (noBulbTicks > 0) {
+                noBulbTicks--;
+                this.setNoBulbTicks(noBulbTicks);
+            }
+        }
+
         boolean isHideSafe = !isBaby() && !isTempting() && this.world.getClosestPlayer(CLOSE_PLAYER_PREDICATE, this) == null && this.getPassengerList().size() == 0 && this.isOnSoulBlock(this.getBlockPos());
         if (this.isHiding() && !isHideSafe) this.setHiding(false);
             else if (this.random.nextInt(100) == 0 && isHideSafe) this.setHiding(true);
@@ -450,7 +465,19 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
             world.sendEntityStatus(this, (byte) 18);
             if (world.getGameRules().getBoolean(GameRules.DO_MOB_LOOT))
                 world.spawnEntity(new ExperienceOrbEntity(world, this.getX(), this.getY(), this.getZ(), this.getRandom().nextInt(7) + 1));
+            
+            this.setNoBulbTicks(6000);
         }
+    }
+
+    public int getNoBulbTicks() {
+        return this.dataTracker.get(NO_BULB_TICKS);
+    }
+    public void setNoBulbTicks(int noBulbTicks) {
+        this.dataTracker.set(NO_BULB_TICKS, noBulbTicks);
+    }
+    public boolean hasBulb() {
+        return this.getNoBulbTicks() == 0;
     }
 
     @Override
@@ -464,7 +491,6 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
         if (this.isSaddled()) {
             this.dropItem(Items.SADDLE);
         }
-
     }
 
     @Override
@@ -553,6 +579,7 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
         BOOST_TIME = DataTracker.registerData(SoulStriderEntity.class, TrackedDataHandlerRegistry.INTEGER);
         SOUL_SURROUNDED = DataTracker.registerData(SoulStriderEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
         HIDING = DataTracker.registerData(SoulStriderEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+        NO_BULB_TICKS = DataTracker.registerData(SoulStriderEntity.class, TrackedDataHandlerRegistry.INTEGER);
         SADDLED = DataTracker.registerData(SoulStriderEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
         CLOSE_PLAYER_PREDICATE = new TargetPredicate().setBaseMaxDistance(8.0D).includeTeammates();
     }
