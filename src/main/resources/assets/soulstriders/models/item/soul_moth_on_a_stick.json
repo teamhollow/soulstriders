@@ -1,0 +1,6 @@
+{
+    "parent": "minecraft:item/handheld_rod",
+    "textures": {
+        "layer0": "soulstriders:item/soul_moth_on_a_stick"
+    }
+}

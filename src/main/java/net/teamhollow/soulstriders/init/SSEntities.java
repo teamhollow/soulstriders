@@ -11,6 +11,7 @@ import net.minecraft.item.SpawnEggItem;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import net.teamhollow.soulstriders.SoulStriders;
+import net.teamhollow.soulstriders.entity.soul_moth.*;
 import net.teamhollow.soulstriders.entity.soul_strider.*;
 import net.teamhollow.soulstriders.entity.wisp.*;
 
@@ -25,10 +26,16 @@ public class SSEntities {
         WispEntity.builder,
         WispEntity.spawnEggColors
     );
+    public static final EntityType<SoulMothEntity> SOUL_MOTH = register(
+        SoulMothEntity.id,
+        SoulMothEntity.builder,
+        SoulMothEntity.spawnEggColors
+    );
 
     public SSEntities() {
         registerDefaultAttributes(SOUL_STRIDER, SoulStriderEntity.createStriderAttributes());
         registerDefaultAttributes(WISP, WispEntity.createWispAttributes());
+        registerDefaultAttributes(SOUL_MOTH, SoulMothEntity.createSoulMothAttributes());
     }
 
     public static void registerRenderers() {
@@ -41,6 +48,10 @@ public class SSEntities {
         INSTANCE.register(
             WISP,
             (entityRenderDispatcher, context) -> new WispEntityRenderer(entityRenderDispatcher)
+        );
+        INSTANCE.register(
+            SOUL_MOTH,
+            (entityRenderDispatcher, context) -> new SoulMothEntityRenderer(entityRenderDispatcher)
         );
     }
 

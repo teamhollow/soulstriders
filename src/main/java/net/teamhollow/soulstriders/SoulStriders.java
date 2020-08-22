@@ -6,7 +6,7 @@ import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.Identifier;
-import net.teamhollow.soulstriders.init.SSEntities;
+import net.teamhollow.soulstriders.init.*;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -28,6 +28,7 @@ public class SoulStriders implements ModInitializer {
         log("Initializing");
 
         new SSEntities();
+        new SSItems();
     }
 
     public static void log(Level level, String message){

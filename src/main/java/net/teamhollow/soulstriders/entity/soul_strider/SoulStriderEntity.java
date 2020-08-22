@@ -76,6 +76,7 @@ import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
 import net.minecraft.world.biome.Biomes;
 import net.teamhollow.soulstriders.init.SSEntities;
+import net.teamhollow.soulstriders.init.SSItems;
 
 public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Saddleable {
     public static final String id = "soul_strider";
@@ -220,7 +221,7 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
             return false;
         } else {
             PlayerEntity playerEntity = (PlayerEntity) entity;
-            return playerEntity.getMainHandStack().getItem() == Items.WARPED_FUNGUS_ON_A_STICK || playerEntity.getOffHandStack().getItem() == Items.WARPED_FUNGUS_ON_A_STICK;
+            return playerEntity.getMainHandStack().getItem() == SSItems.SOUL_MOTH_ON_A_STICK || playerEntity.getOffHandStack().getItem() == SSItems.SOUL_MOTH_ON_A_STICK;
         }
     }
 
@@ -502,7 +503,7 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
 
     @Override
     public ActionResult interactMob(PlayerEntity player, Hand hand) {
-        boolean playerHoldingBreedingItem = this.isBreedingItem(player.getStackInHand(hand));
+        boolean playerHoldingBreedingItem = player.getStackInHand(hand).getItem() == SSItems.SOUL_MOTH_IN_A_BOTTLE;
         if (!playerHoldingBreedingItem && this.isSaddled() && !this.hasPassengers()) {
             if (!this.world.isClient) {
                 player.startRiding(this);
@@ -516,8 +517,8 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
                 return itemStack.getItem() == Items.SADDLE ? itemStack.useOnEntity(player, this, hand) : ActionResult.PASS;
             } else {
                 if (playerHoldingBreedingItem && !this.isSilent()) {
-                    this.world.playSound((PlayerEntity) null, this.getX(), this.getY(), this.getZ(), SoundEvents.ENTITY_STRIDER_EAT, this.getSoundCategory(), 1.0F,
-                            1.0F + (this.random.nextFloat() - this.random.nextFloat()) * 0.2F);
+                    this.world.playSound((PlayerEntity) null, this.getX(), this.getY(), this.getZ(), SoundEvents.ENTITY_STRIDER_EAT, this.getSoundCategory(), 1.0F, 1.0F + (this.random.nextFloat() - this.random.nextFloat()) * 0.2F);
+                    player.setStackInHand(hand, new ItemStack(Items.GLASS_BOTTLE));
                 }
 
                 return actionResult;
@@ -581,8 +582,8 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
     }
 
     static {
-        BREEDING_INGREDIENT = Ingredient.ofItems(Items.SOUL_SOIL);
-        ATTRACTING_INGREDIENT = Ingredient.ofItems(Items.SOUL_SOIL, Items.WARPED_FUNGUS_ON_A_STICK);
+        BREEDING_INGREDIENT = Ingredient.ofItems(SSItems.SOUL_MOTH_IN_A_BOTTLE);
+        ATTRACTING_INGREDIENT = Ingredient.ofItems(SSItems.SOUL_MOTH_IN_A_BOTTLE, SSItems.SOUL_MOTH_ON_A_STICK);
         BOOST_TIME = DataTracker.registerData(SoulStriderEntity.class, TrackedDataHandlerRegistry.INTEGER);
         SOUL_SURROUNDED = DataTracker.registerData(SoulStriderEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
         HIDING = DataTracker.registerData(SoulStriderEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
