@@ -460,7 +460,9 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
             other.setBreedingAge(6000);
             this.resetLoveTicks();
             other.resetLoveTicks();
+
             wisp.refreshPositionAndAngles(this.getX(), this.getY(), this.getZ(), 0.0F, 0.0F);
+            wisp.setPersistent();
             world.spawnEntity(wisp);
             world.sendEntityStatus(this, (byte) 18);
             if (world.getGameRules().getBoolean(GameRules.DO_MOB_LOOT))

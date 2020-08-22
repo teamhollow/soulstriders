@@ -6,7 +6,6 @@ import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
-import net.minecraft.entity.ai.goal.FollowTargetGoal;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
@@ -19,6 +18,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.teamhollow.soulstriders.entity.soul_strider.SoulStriderEntity;
+import net.teamhollow.soulstriders.init.SSEntities;
 
 public class WispEntity extends PassiveEntity {
     public static final String id = "wisp";
@@ -33,14 +33,19 @@ public class WispEntity extends PassiveEntity {
     }
 
     @Override
-    protected void initGoals() {
-        this.targetSelector.add(1, new FollowTargetGoal<SoulStriderEntity>(this, SoulStriderEntity.class, 10, true, false, (livingEntity) -> {
-            return Math.abs(livingEntity.getY() - this.getY()) <= 4.0D;
-        }));
-    }
-
-    @Override
     protected void mobTick() {
+        if (this.age >= 6000) {
+            SoulStriderEntity soulStrider = SSEntities.SOUL_STRIDER.create(this.world);
+            if (soulStrider != null) {
+                soulStrider.refreshPositionAndAngles(this.getX(), this.getY(), this.getZ(), this.yaw, this.pitch);
+                soulStrider.setBaby(true);
+                soulStrider.setPersistent();
+                this.world.spawnEntity(soulStrider);
+            }
+            this.remove();
+            return;
+        }
+
         BlockPos randomPos = new BlockPos (
             this.getX() + this.random.nextInt(7) - this.random.nextInt(7),
             this.getY() + this.random.nextInt(6) - 2.0D,
@@ -52,7 +57,7 @@ public class WispEntity extends PassiveEntity {
         double z = randomPos.getZ() + 0.5D - this.getZ();
 
         Vec3d vec3d = this.getVelocity();
-        vec3d = vec3d.add(
+        vec3d = vec3d.add (
             (Math.signum(x) * 0.5D - vec3d.x) * 0.10000000149011612D,
             ((Math.signum(y) * 0.699999988079071D - vec3d.y) * 0.10000000149011612D) + 0.061D,
             (Math.signum(z) * 0.5D - vec3d.z) * 0.10000000149011612D

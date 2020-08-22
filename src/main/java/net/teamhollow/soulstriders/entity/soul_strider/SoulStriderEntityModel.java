@@ -62,7 +62,7 @@ public class SoulStriderEntityModel<T extends SoulStriderEntity> extends Composi
             this.head.yaw = 0.0F;
         }
 
-        boolean hasBulb = entity.hasBulb();
+        boolean hasBulb = entity.hasBulb() && !entity.isBaby();
         bulb.visible = hasBulb;
         lure.pitch = hasBulb ? -0.6981F : 0;
 
