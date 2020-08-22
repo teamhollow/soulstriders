@@ -496,6 +496,11 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
     }
 
     @Override
+    public boolean handleFallDamage(float fallDistance, float damageMultiplier) {
+        return false;
+    }
+
+    @Override
     public ActionResult interactMob(PlayerEntity player, Hand hand) {
         boolean playerHoldingBreedingItem = this.isBreedingItem(player.getStackInHand(hand));
         if (!playerHoldingBreedingItem && this.isSaddled() && !this.hasPassengers()) {
