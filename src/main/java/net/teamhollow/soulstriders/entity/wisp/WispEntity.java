@@ -5,7 +5,10 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SpawnGroup;
+import net.minecraft.entity.ai.goal.FollowTargetGoal;
+import net.minecraft.entity.ai.goal.LookAtEntityGoal;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
@@ -33,6 +36,14 @@ public class WispEntity extends PassiveEntity {
     }
 
     @Override
+    protected void initGoals() {
+        super.initGoals();
+
+        this.goalSelector.add(8, new LookAtEntityGoal(this, SoulStriderEntity.class, 16.0F));
+        this.targetSelector.add(2, new FollowTargetGoal<SoulStriderEntity>(this, SoulStriderEntity.class, true));
+    }
+
+    @Override
     protected void mobTick() {
         if (this.age >= 6000) {
             SoulStriderEntity soulStrider = SSEntities.SOUL_STRIDER.create(this.world);
@@ -46,20 +57,20 @@ public class WispEntity extends PassiveEntity {
             return;
         }
 
-        BlockPos randomPos = new BlockPos (
-            this.getX() + this.random.nextInt(7) - this.random.nextInt(7),
-            this.getY() + this.random.nextInt(6) - 2.0D,
-            this.getZ() + this.random.nextInt(7) - this.random.nextInt(7)
-        );
+        LivingEntity target = this.getTarget();
+        BlockPos randomPos = target == null ? new BlockPos(this.getX(), this.getY(), this.getZ()) : new BlockPos(target.getX() - this.getX(), target.getY() - this.getY(), target.getZ() - this.getZ());
+        randomPos = new BlockPos(randomPos.getX() + this.random.nextInt(7) - this.random.nextInt(7),
+                randomPos.getY() + this.random.nextInt(6) - 2.0D,
+                randomPos.getZ() + this.random.nextInt(7) - this.random.nextInt(7));
 
         double x = randomPos.getX() + 0.5D - this.getX();
         double y = randomPos.getY() + 0.1D - this.getY();
         double z = randomPos.getZ() + 0.5D - this.getZ();
 
         Vec3d vec3d = this.getVelocity();
-        vec3d = vec3d.add (
+        vec3d = vec3d.add(
             (Math.signum(x) * 0.5D - vec3d.x) * 0.10000000149011612D,
-            ((Math.signum(y) * 0.699999988079071D - vec3d.y) * 0.10000000149011612D) + 0.061D,
+            ((Math.signum(y) * 0.699999988079071D - vec3d.y) * 0.10000000149011612D) + (target != null && target.getEyeY() > this.getY() ? 0.177D : 0.061D),
             (Math.signum(z) * 0.5D - vec3d.z) * 0.10000000149011612D
         );
 
