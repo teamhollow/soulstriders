@@ -27,6 +27,7 @@ public class WispEntity extends PassiveEntity {
     public static final String id = "wisp";
     public static final EntityType.Builder<WispEntity> builder = EntityType.Builder
         .create(WispEntity::new, SpawnGroup.AMBIENT)
+        .makeFireImmune()
         .setDimensions(0.5F, 0.5F)
         .maxTrackingRange(5);
     public static final int[] spawnEggColors = { 10236982, 5065037 };
@@ -58,10 +59,19 @@ public class WispEntity extends PassiveEntity {
         }
 
         LivingEntity target = this.getTarget();
-        BlockPos randomPos = target == null ? new BlockPos(this.getX(), this.getY(), this.getZ()) : new BlockPos(target.getX() - this.getX(), target.getY() - this.getY(), target.getZ() - this.getZ());
-        randomPos = new BlockPos(randomPos.getX() + this.random.nextInt(7) - this.random.nextInt(7),
-                randomPos.getY() + this.random.nextInt(6) - 2.0D,
-                randomPos.getZ() + this.random.nextInt(7) - this.random.nextInt(7));
+        BlockPos randomPos = target == null
+            ? new BlockPos(this.getX(), this.getY(), this.getZ())
+            : new BlockPos(
+                target.getX() - this.getX(),
+                target.getY() - this.getY(),
+                target.getZ() - this.getZ()
+            )
+        ;
+        randomPos = new BlockPos(
+            randomPos.getX() + this.random.nextInt(7) - this.random.nextInt(7),
+            randomPos.getY() + this.random.nextInt(6) - 2.0D,
+            randomPos.getZ() + this.random.nextInt(7) - this.random.nextInt(7)
+        );
 
         double x = randomPos.getX() + 0.5D - this.getX();
         double y = randomPos.getY() + 0.1D - this.getY();
