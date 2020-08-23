@@ -192,7 +192,6 @@ public class SoulMothEntity extends PathAwareEntity {
                 BlockState blockState = world.getBlockState(pos);
                 BlockState newState = blockState;
 
-                net.teamhollow.soulstriders.SoulStriders.log(Registry.BLOCK.getId(blockState.getBlock()).toString());
                 switch (Registry.BLOCK.getId(blockState.getBlock()).toString()) {
                     case "minecraft:torch":
                         newState = Blocks.SOUL_TORCH.getDefaultState();
