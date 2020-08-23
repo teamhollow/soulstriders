@@ -32,7 +32,10 @@ dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
     mappings "net.fabricmc:yarn:${project.minecraft_version}+build.${project.yarn_build}:v2"
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}-${project.minecraft_version}"
+
+    modImplementation "com.github.bernie-g:geckolib:fabric-${project.minecraft_version}-geckolib-${project.geckolib_version}"
+    include "com.github.bernie-g:geckolib:fabric-${project.minecraft_version}-geckolib-${project.geckolib_version}"
 
     modRuntime "io.github.prospector:modmenu:${project.mod_menu_version}"
     modRuntime "com.github.jellysquid3:lithium-fabric:mc${project.minecraft_version}-${project.lithium_version}"

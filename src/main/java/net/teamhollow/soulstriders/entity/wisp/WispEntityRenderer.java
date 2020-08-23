@@ -8,11 +8,11 @@ import net.minecraft.util.Identifier;
 import net.teamhollow.soulstriders.init.SSEntities;
 
 @Environment(EnvType.CLIENT)
-public class WispEntityRenderer extends MobEntityRenderer<WispEntity, WispEntityModel<WispEntity>> {
+public class WispEntityRenderer extends MobEntityRenderer<WispEntity, WispEntityModel> {
     private static final Identifier TEXTURE = SSEntities.texture("wisp/wisp");
 
     public WispEntityRenderer(EntityRenderDispatcher entityRenderDispatcher) {
-        super(entityRenderDispatcher, new WispEntityModel<WispEntity>(), 0.25F);
+        super(entityRenderDispatcher, new WispEntityModel(), 0.25F);
     }
 
     @Override

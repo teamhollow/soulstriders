@@ -22,15 +22,16 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.teamhollow.soulstriders.entity.soul_strider.SoulStriderEntity;
 import net.teamhollow.soulstriders.init.SSEntities;
+import software.bernie.geckolib.entity.IAnimatedEntity;
+import software.bernie.geckolib.manager.EntityAnimationManager;
 
-public class WispEntity extends PassiveEntity {
+public class WispEntity extends PassiveEntity implements IAnimatedEntity {
     public static final String id = "wisp";
     public static final EntityType.Builder<WispEntity> builder = EntityType.Builder
-        .create(WispEntity::new, SpawnGroup.AMBIENT)
-        .makeFireImmune()
-        .setDimensions(0.5F, 0.5F)
-        .maxTrackingRange(5);
+            .create(WispEntity::new, SpawnGroup.AMBIENT).makeFireImmune().setDimensions(0.5F, 0.5F).maxTrackingRange(5);
     public static final int[] spawnEggColors = { 10236982, 5065037 };
+
+	EntityAnimationManager entityAnimationManager = new EntityAnimationManager();
 
     public WispEntity(EntityType<? extends WispEntity> entityType, World world) {
         super(entityType, world);
@@ -59,35 +60,27 @@ public class WispEntity extends PassiveEntity {
         }
 
         LivingEntity target = this.getTarget();
-        BlockPos randomPos = target == null
-            ? new BlockPos(this.getX(), this.getY(), this.getZ())
-            : new BlockPos(
-                target.getX() - this.getX(),
-                target.getY() - this.getY(),
-                target.getZ() - this.getZ()
-            )
-        ;
-        randomPos = new BlockPos(
-            randomPos.getX() + this.random.nextInt(7) - this.random.nextInt(7),
-            randomPos.getY() + this.random.nextInt(6) - 2.0D,
-            randomPos.getZ() + this.random.nextInt(7) - this.random.nextInt(7)
-        );
+        BlockPos randomPos = target == null ? new BlockPos(this.getX(), this.getY(), this.getZ())
+                : new BlockPos(target.getX() - this.getX(), target.getY() - this.getY(), target.getZ() - this.getZ());
+        randomPos = new BlockPos(randomPos.getX() + this.random.nextInt(7) - this.random.nextInt(7),
+                randomPos.getY() + this.random.nextInt(6) - 2.0D,
+                randomPos.getZ() + this.random.nextInt(7) - this.random.nextInt(7));
 
         double x = randomPos.getX() + 0.5D - this.getX();
         double y = randomPos.getY() + 0.1D - this.getY();
         double z = randomPos.getZ() + 0.5D - this.getZ();
 
         Vec3d vec3d = this.getVelocity();
-        vec3d = vec3d.add(
-            (Math.signum(x) * 0.5D - vec3d.x) * 0.10000000149011612D,
-            ((Math.signum(y) * 0.699999988079071D - vec3d.y) * 0.10000000149011612D) + (target != null && target.getEyeY() > this.getY() ? 0.177D : 0.061D),
-            (Math.signum(z) * 0.5D - vec3d.z) * 0.10000000149011612D
-        );
+        vec3d = vec3d.add((Math.signum(x) * 0.5D - vec3d.x) * 0.10000000149011612D,
+                ((Math.signum(y) * 0.699999988079071D - vec3d.y) * 0.10000000149011612D)
+                        + (target != null && target.getEyeY() > this.getY() ? 0.177D : 0.061D),
+                (Math.signum(z) * 0.5D - vec3d.z) * 0.10000000149011612D);
 
         this.setVelocity(vec3d);
         this.forwardSpeed = 0.5F;
 
-        this.yaw += MathHelper.wrapDegrees(((float) (MathHelper.atan2(vec3d.z, vec3d.x) * 57.2957763671875D) - 90.0F) - this.yaw);
+        this.yaw += MathHelper
+                .wrapDegrees(((float) (MathHelper.atan2(vec3d.z, vec3d.x) * 57.2957763671875D) - 90.0F) - this.yaw);
     }
 
     @Override
@@ -121,10 +114,12 @@ public class WispEntity extends PassiveEntity {
     }
 
     @Override
-    protected void pushAway(Entity entity) {}
+    protected void pushAway(Entity entity) {
+    }
 
     @Override
-    protected void tickCramming() {}
+    protected void tickCramming() {
+    }
 
     public static DefaultAttributeContainer.Builder createWispAttributes() {
         return MobEntity.createMobAttributes().add(EntityAttributes.GENERIC_MAX_HEALTH, 6.0D);
@@ -141,7 +136,8 @@ public class WispEntity extends PassiveEntity {
     }
 
     @Override
-    protected void fall(double heightDifference, boolean onGround, BlockState landedState, BlockPos landedPosition) {}
+    protected void fall(double heightDifference, boolean onGround, BlockState landedState, BlockPos landedPosition) {
+    }
 
     @Override
     public boolean canAvoidTraps() {
@@ -156,5 +152,10 @@ public class WispEntity extends PassiveEntity {
     @Override
     public PassiveEntity createChild(PassiveEntity mate) {
         return null;
+    }
+
+    @Override
+    public EntityAnimationManager getAnimationManager() {
+        return entityAnimationManager;
     }
 }
