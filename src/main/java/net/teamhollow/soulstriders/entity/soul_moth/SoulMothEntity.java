@@ -26,6 +26,7 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.registry.Registry;
@@ -54,21 +55,34 @@ public class SoulMothEntity extends PathAwareEntity {
     protected void initGoals() {
         super.initGoals();
 
-        this.goalSelector.add(8, new LookAtEntityGoal(this, WispEntity.class, 16.0F));
-        this.goalSelector.add(10, new SoulMothEntity.SoulifyBlockGoal(1.2000000476837158D, 12, 2));
+        this.goalSelector.add(2, new LookAtEntityGoal(this, WispEntity.class, 16.0F));
+        this.goalSelector.add(1, new SoulMothEntity.TargetSoulifiableBlock(1.5D, 14, 8));
+        this.goalSelector.add(1, new SoulMothEntity.SoulifyBlockGoal(1.5D, 2, 2));
         this.targetSelector.add(2, new FollowTargetGoal<WispEntity>(this, WispEntity.class, true));
     }
 
     @Override
     protected void mobTick() {
+        super.mobTick();
+
+        if (this.targetPos != null) {
+            BlockState targetPosBlockState = world.getBlockState(targetPos);
+            if (!(
+                   targetPosBlockState.isOf(Blocks.TORCH)
+                || targetPosBlockState.isOf(Blocks.WALL_TORCH)
+                || targetPosBlockState.isOf(Blocks.LANTERN)
+                || targetPosBlockState.isOf(Blocks.CAMPFIRE)
+            )) this.targetPos = null;
+        }
+
         LivingEntity targetEntity = this.getTarget();
-        BlockPos target = targetEntity == null ? this.targetPos : targetEntity.getBlockPos();
-        BlockPos randomPos = target == null
+        BlockPos randomPos = targetEntity == null ? this.targetPos : targetEntity.getBlockPos();
+        randomPos = randomPos == null
             ? new BlockPos(this.getX(), this.getY(), this.getZ())
             : new BlockPos(
-                target.getX(),
-                target.getY(),
-                target.getZ()
+                randomPos.getX(),
+                randomPos.getY(),
+                randomPos.getZ()
             )
         ;
         randomPos = new BlockPos(
@@ -154,9 +168,11 @@ public class SoulMothEntity extends PathAwareEntity {
 
     class SoulifyBlockGoal extends MoveToTargetPosGoal {
         protected int timer;
+        protected int range;
 
         public SoulifyBlockGoal(double speed, int range, int maxYDifference) {
             super(SoulMothEntity.this, speed, range, maxYDifference);
+            this.range = range;
         }
 
         public double getDesiredSquaredDistanceToTarget() {
@@ -169,7 +185,10 @@ public class SoulMothEntity extends PathAwareEntity {
 
         protected boolean isTargetPos(WorldView world, BlockPos pos) {
             BlockState blockState = world.getBlockState(pos);
-            return blockState.isOf(Blocks.TORCH) || blockState.isOf(Blocks.WALL_TORCH) || (blockState.isOf(Blocks.CAMPFIRE) && blockState.get(CampfireBlock.LIT) && !blockState.get(CampfireBlock.WATERLOGGED));
+
+            boolean isTargetPos = blockState.isOf(Blocks.TORCH) || blockState.isOf(Blocks.WALL_TORCH) || (blockState.isOf(Blocks.LANTERN) || (blockState.isOf(Blocks.CAMPFIRE) && !(blockState.get(CampfireBlock.LIT) && blockState.get(CampfireBlock.WATERLOGGED))));
+
+            return isTargetPos;
         }
 
         public void tick() {
@@ -220,16 +239,49 @@ public class SoulMothEntity extends PathAwareEntity {
         public void start() {
             this.timer = 0;
             super.start();
-
-            SoulMothEntity entity = (SoulMothEntity)mob;
-            entity.targetPos = this.targetPos;
         }
-
         public void stop() {
-            super.stop();
-
             SoulMothEntity entity = (SoulMothEntity) mob;
             entity.targetPos = null;
+
+            super.stop();
+        }
+
+        public boolean canStart() {
+            double localEntityRange = 2.0D;
+
+            return super.canStart() && mob.world.getEntities(
+                mob,
+                new Box(
+                    mob.getX() - localEntityRange, mob.getY() - localEntityRange, mob.getZ() - localEntityRange,
+                    mob.getX() + localEntityRange, mob.getY() + localEntityRange, mob.getZ() + localEntityRange)
+                ).size() >= 14;
+        }
+    }
+
+    class TargetSoulifiableBlock extends MoveToTargetPosGoal {
+        protected int timer;
+
+        public TargetSoulifiableBlock(double speed, int range, int maxYDifference) {
+            super(SoulMothEntity.this, speed, range, maxYDifference);
+        }
+
+        protected boolean isTargetPos(WorldView world, BlockPos pos) {
+            BlockState blockState = world.getBlockState(pos);
+            return blockState.isOf(Blocks.TORCH) || blockState.isOf(Blocks.WALL_TORCH) || (blockState.isOf(Blocks.LANTERN) || (blockState.isOf(Blocks.CAMPFIRE) && !(blockState.get(CampfireBlock.LIT) && blockState.get(CampfireBlock.WATERLOGGED))));
+        }
+
+        public boolean shouldContinue() {
+            return false;
+        }
+
+        public void start() {
+            this.timer = 0;
+
+            SoulMothEntity entity = (SoulMothEntity) mob;
+            entity.targetPos = this.targetPos;
+
+            super.start();
         }
     }
 }
