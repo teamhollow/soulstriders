@@ -33,6 +33,7 @@ import net.minecraft.util.registry.Registry;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldView;
+import net.teamhollow.soulstriders.entity.soul_strider.SoulStriderEntity;
 import net.teamhollow.soulstriders.entity.wisp.WispEntity;
 import net.teamhollow.soulstriders.init.SSItems;
 
@@ -59,6 +60,7 @@ public class SoulMothEntity extends PathAwareEntity {
         this.goalSelector.add(1, new SoulMothEntity.TargetSoulifiableBlock(1.5D, 14, 8));
         this.goalSelector.add(1, new SoulMothEntity.SoulifyBlockGoal(1.5D, 2, 2));
         this.targetSelector.add(2, new FollowTargetGoal<WispEntity>(this, WispEntity.class, true));
+        this.targetSelector.add(2, new FollowTargetGoal<SoulStriderEntity>(this, SoulStriderEntity.class, true));
     }
 
     @Override
@@ -76,6 +78,8 @@ public class SoulMothEntity extends PathAwareEntity {
         }
 
         LivingEntity targetEntity = this.getTarget();
+        if (targetEntity instanceof SoulStriderEntity && !((SoulStriderEntity) targetEntity).isHiding())
+            targetEntity = null;
         BlockPos randomPos = targetEntity == null ? this.targetPos : targetEntity.getBlockPos();
         randomPos = randomPos == null
             ? new BlockPos(this.getX(), this.getY(), this.getZ())
@@ -198,8 +202,6 @@ public class SoulMothEntity extends PathAwareEntity {
                 } else {
                     this.timer++;
                 }
-            } else if (!this.hasReached() && random.nextFloat() < 0.05F) {
-                playSound(SoundEvents.ENTITY_FOX_SNIFF, 1.0F, 1.0F);
             }
 
             super.tick();

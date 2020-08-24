@@ -1,5 +1,6 @@
 package net.teamhollow.soulstriders.entity.soul_strider;
 
+import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.Random;
 import java.util.Set;
@@ -29,8 +30,8 @@ import net.minecraft.entity.ai.TargetPredicate;
 import net.minecraft.entity.ai.goal.AnimalMateGoal;
 import net.minecraft.entity.ai.goal.EscapeDangerGoal;
 import net.minecraft.entity.ai.goal.FollowParentGoal;
+import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.ai.goal.LookAroundGoal;
-import net.minecraft.entity.ai.goal.LookAtEntityGoal;
 import net.minecraft.entity.ai.goal.TemptGoal;
 import net.minecraft.entity.ai.goal.WanderAroundGoal;
 import net.minecraft.entity.ai.pathing.EntityNavigation;
@@ -54,6 +55,7 @@ import net.minecraft.fluid.Fluid;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
@@ -75,6 +77,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
 import net.minecraft.world.biome.Biomes;
+import net.teamhollow.soulstriders.entity.soul_moth.SoulMothEntity;
 import net.teamhollow.soulstriders.init.SSEntities;
 import net.teamhollow.soulstriders.init.SSItems;
 
@@ -111,9 +114,8 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
     public static boolean canSpawn(EntityType<SoulStriderEntity> type, WorldAccess worldAccess, SpawnReason spawnReason, BlockPos blockPos, Random random) {
         BlockPos.Mutable mutable = blockPos.mutableCopy();
 
-        do {
-            mutable.move(Direction.UP);
-        } while (worldAccess.getBlockState(mutable).isOf(Blocks.SOUL_SAND));
+        do mutable.move(Direction.UP);
+            while (worldAccess.getBlockState(mutable).isOf(Blocks.SOUL_SAND));
 
         return worldAccess.getBlockState(mutable).isAir();
     }
@@ -181,9 +183,9 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
         this.goalSelector.add(4, this.temptGoal);
         this.goalSelector.add(5, new FollowParentGoal(this, 1.1D));
         this.goalSelector.add(7, new WanderAroundGoal(this, 1.0D, 60));
-        this.goalSelector.add(8, new LookAtEntityGoal(this, PlayerEntity.class, 8.0F));
+        this.goalSelector.add(8, new LookAtEntityGoal(this, 8.0F, 0.02F));
+        this.goalSelector.add(8, new EatSoulMothGoal(this, 1.5F));
         this.goalSelector.add(8, new LookAroundGoal(this));
-        this.goalSelector.add(9, new LookAtEntityGoal(this, SoulStriderEntity.class, 8.0F));
     }
 
     public void setSoulSurrounded(boolean soulSurrounded) {
@@ -368,11 +370,15 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
                 noBulbTicks--;
                 this.setNoBulbTicks(noBulbTicks);
             }
-        }
 
-        boolean isHideSafe = hasBulb() && !isBaby() && !isTempting() && this.world.getClosestPlayer(CLOSE_PLAYER_PREDICATE, this) == null && this.getPassengerList().size() == 0 && this.isOnSoulBlock(this.getBlockPos());
-        if (this.isHiding() && !isHideSafe) this.setHiding(false);
-            else if (this.random.nextInt(100) == 0 && isHideSafe) this.setHiding(true);
+            boolean isHideSafe = hasBulb() && !isBaby() && !isTempting()
+                    && this.world.getClosestPlayer(CLOSE_PLAYER_PREDICATE, this) == null
+                    && this.getPassengerList().size() == 0 && this.isOnSoulBlock(this.getBlockPos());
+            if (this.isHiding() && !isHideSafe)
+                this.setHiding(false);
+            else if (this.random.nextInt(100) == 0 && isHideSafe)
+                this.setHiding(true);
+        }
     }
 
     public boolean isHiding() {
@@ -629,5 +635,109 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
     @Override
     public PassiveEntity createChild(PassiveEntity mate) {
         return null;
+    }
+
+    class LookAtEntityGoal extends Goal {
+        protected final MobEntity mob;
+        protected Entity target;
+        protected final float range;
+        private int lookTime;
+        protected final float chance;
+        protected Class<? extends LivingEntity> targetType;
+        protected final TargetPredicate targetPredicate;
+
+        public LookAtEntityGoal(MobEntity mob, float range, float chance) {
+            this.mob = mob;
+            this.range = range;
+            this.chance = chance;
+            this.setControls(EnumSet.of(Goal.Control.LOOK));
+            if (targetType == PlayerEntity.class) {
+                this.targetPredicate = (new TargetPredicate()).setBaseMaxDistance((double) range).includeTeammates().includeInvulnerable().ignoreEntityTargetRules().setPredicate((livingEntity) -> {
+                            return EntityPredicates.rides(mob).test(livingEntity);
+                        });
+            } else {
+                this.targetPredicate = (new TargetPredicate()).setBaseMaxDistance((double) range).includeTeammates().includeInvulnerable().ignoreEntityTargetRules();
+            }
+
+        }
+
+        public boolean canStart() {
+            SoulStriderEntity mob = (SoulStriderEntity)this.mob;
+            this.targetType = mob.isHiding() ? SoulMothEntity.class : (mob.random.nextInt(5) == 0 ? PlayerEntity.class : SoulStriderEntity.class);
+
+            if (this.mob.getRandom().nextFloat() >= this.chance) {
+                return false;
+            } else {
+                if (this.mob.getTarget() != null) {
+                    this.target = this.mob.getTarget();
+                }
+
+                if (this.targetType == PlayerEntity.class) {
+                    this.target = this.mob.world.getClosestPlayer(this.targetPredicate, this.mob, this.mob.getX(),
+                            this.mob.getEyeY(), this.mob.getZ());
+                } else {
+                    this.target = this.mob.world.getClosestEntityIncludingUngeneratedChunks(this.targetType,
+                            this.targetPredicate, this.mob, this.mob.getX(), this.mob.getEyeY(), this.mob.getZ(),
+                            this.mob.getBoundingBox().expand((double) this.range, 3.0D, (double) this.range));
+                }
+
+                return this.target != null;
+            }
+        }
+
+        public boolean shouldContinue() {
+            if (!this.target.isAlive()) {
+                return false;
+            } else if (this.mob.squaredDistanceTo(this.target) > (double) (this.range * this.range)) {
+                return false;
+            } else {
+                return this.lookTime > 0;
+            }
+        }
+
+        public void start() {
+            this.lookTime = 40 + this.mob.getRandom().nextInt(40);
+        }
+
+        public void stop() {
+            this.target = null;
+        }
+
+        public void tick() {
+            this.mob.getLookControl().lookAt(this.target.getX(), this.target.getEyeY(), this.target.getZ());
+            --this.lookTime;
+        }
+    }
+
+    class EatSoulMothGoal extends Goal {
+        protected SoulStriderEntity mob;
+        protected float range;
+
+        public EatSoulMothGoal(SoulStriderEntity mob, float range) {
+            super();
+            this.mob = mob;
+            this.range = range;
+        }
+
+        @Override
+        public void tick() {
+            if (random.nextInt(40) == 0) {
+                eatMoth(this.mob.world.getClosestEntityIncludingUngeneratedChunks(SoulMothEntity.class, new TargetPredicate().setBaseMaxDistance(range).includeTeammates().includeInvulnerable().ignoreEntityTargetRules(), this.mob, this.mob.getX(), this.mob.getEyeY(), this.mob.getZ(), this.mob.getBoundingBox().expand(this.range, this.range, this.range)));
+            }
+
+            super.tick();
+        }
+
+        private void eatMoth(SoulMothEntity entity) {
+            if (entity != null) {
+                entity.playSound(SoundEvents.ENTITY_FOX_EAT, 1.0F, 1.0F);
+                entity.remove();
+            }
+        }
+
+        @Override
+        public boolean canStart() {
+            return mob.isHiding();
+        }
     }
 }
