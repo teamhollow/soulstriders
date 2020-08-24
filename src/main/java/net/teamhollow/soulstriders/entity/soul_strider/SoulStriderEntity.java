@@ -46,6 +46,7 @@ import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.entity.mob.ZombieEntity;
 import net.minecraft.entity.mob.ZombifiedPiglinEntity;
 import net.minecraft.entity.passive.AnimalEntity;
@@ -176,7 +177,7 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
 
     @Override
     protected void initGoals() {
-        this.escapeDangerGoal = new EscapeDangerGoal(this, 1.65D);
+        this.escapeDangerGoal = new EscapePlayersGoal(this, 3.0D);
         this.goalSelector.add(1, this.escapeDangerGoal);
         this.goalSelector.add(3, new AnimalMateGoal(this, 1.0D));
         this.temptGoal = new TemptGoal(this, 1.4D, false, ATTRACTING_INGREDIENT);
@@ -192,7 +193,9 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
         this.dataTracker.set(SOUL_SURROUNDED, soulSurrounded);
     }
     public boolean isSoulSurrounded() {
-        return this.getVehicle() instanceof SoulStriderEntity ? ((SoulStriderEntity) this.getVehicle()).isSoulSurrounded() : this.dataTracker.get(SOUL_SURROUNDED);
+        return this.getVehicle() instanceof SoulStriderEntity
+                ? ((SoulStriderEntity) this.getVehicle()).isSoulSurrounded()
+                : this.dataTracker.get(SOUL_SURROUNDED);
     }
 
     @Override
@@ -364,7 +367,7 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
         if (this.isAlive()) {
             int noBulbTicks = this.getNoBulbTicks();
             if (noBulbTicks < 0) {
-                noBulbTicks ++;
+                noBulbTicks++;
                 this.setNoBulbTicks(noBulbTicks);
             } else if (noBulbTicks > 0) {
                 noBulbTicks--;
@@ -738,6 +741,39 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
         @Override
         public boolean canStart() {
             return mob.isHiding();
+        }
+    }
+
+    class EscapePlayersGoal extends EscapeDangerGoal {
+        public EscapePlayersGoal(PathAwareEntity mob, double speed) {
+            super(mob, speed);
+        }
+
+        @Override
+        public boolean canStart() {
+            if (mob.world.getClosestPlayer(
+                new TargetPredicate()
+                    .setBaseMaxDistance(15.0D)
+                    .includeTeammates()
+                    .includeInvulnerable()
+                    .ignoreEntityTargetRules()
+                    .setPredicate((livingEntity) -> {
+                        return EntityPredicates.rides(mob).test(livingEntity);
+                    }), this.mob, this.mob.getX(), this.mob.getEyeY(), this.mob.getZ()) == null && !mob.isOnFire()) {
+                return false;
+            } else {
+                if (mob.isOnFire()) {
+                    BlockPos blockPos = this.locateClosestWater(mob.world, mob, 5, 4);
+                    if (blockPos != null) {
+                        this.targetX = blockPos.getX();
+                        this.targetY = blockPos.getY();
+                        this.targetZ = blockPos.getZ();
+                        return true;
+                    }
+                }
+
+                return this.findTarget();
+            }
         }
     }
 }
