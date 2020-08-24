@@ -2,11 +2,13 @@ package net.teamhollow.soulstriders.entity.wisp;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SpawnGroup;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.goal.FollowTargetGoal;
 import net.minecraft.entity.ai.goal.LookAtEntityGoal;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
@@ -14,6 +16,7 @@ import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.passive.PassiveEntity;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
@@ -45,11 +48,29 @@ public class WispEntity extends PassiveEntity {
     }
 
     @Override
+    public void writeCustomDataToTag(CompoundTag tag) {
+        super.writeCustomDataToTag(tag);
+        tag.putInt("Age", this.age);
+    }
+
+    @Override
+    public void readCustomDataFromTag(CompoundTag tag) {
+        super.readCustomDataFromTag(tag);
+        this.age = tag.getInt("Age");
+    }
+
+    @Override
     protected void mobTick() {
         if (this.age >= 6000) {
             SoulStriderEntity soulStrider = SSEntities.SOUL_STRIDER.create(this.world);
             if (soulStrider != null) {
                 soulStrider.refreshPositionAndAngles(this.getX(), this.getY(), this.getZ(), this.yaw, this.pitch);
+                soulStrider.initialize(this.world, this.world.getLocalDifficulty(soulStrider.getBlockPos()), SpawnReason.BREEDING, (EntityData) null, (CompoundTag) null);
+                soulStrider.setAiDisabled(this.isAiDisabled());
+                if (this.hasCustomName()) {
+                    soulStrider.setCustomName(this.getCustomName());
+                    soulStrider.setCustomNameVisible(this.isCustomNameVisible());
+                }
                 soulStrider.setBaby(true);
                 soulStrider.setPersistent();
                 this.world.spawnEntity(soulStrider);
