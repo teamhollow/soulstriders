@@ -22,6 +22,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsage;
 import net.minecraft.item.Items;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
@@ -64,13 +65,23 @@ public class SoulMothEntity extends PathAwareEntity {
     }
 
     @Override
+    public void tick() {
+        super.tick();
+
+        if (this.world.isClient())
+            this.world.addParticle(ParticleTypes.MYCELIUM, this.getX(), this.getY(), this.getZ(), 0, 0, 0);
+    }
+
+    @Override
     protected void mobTick() {
         super.mobTick();
 
+        if (!this.isAlive())
+            return;
+
         if (this.targetPos != null) {
             BlockState targetPosBlockState = world.getBlockState(targetPos);
-            if (!(
-                   targetPosBlockState.isOf(Blocks.TORCH)
+            if (!( targetPosBlockState.isOf(Blocks.TORCH)
                 || targetPosBlockState.isOf(Blocks.WALL_TORCH)
                 || targetPosBlockState.isOf(Blocks.LANTERN)
                 || targetPosBlockState.isOf(Blocks.CAMPFIRE)
