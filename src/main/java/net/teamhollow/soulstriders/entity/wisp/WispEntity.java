@@ -33,7 +33,7 @@ public class WispEntity extends PassiveEntity {
         .makeFireImmune()
         .setDimensions(0.5F, 0.5F)
         .maxTrackingRange(5);
-    public static final int[] spawnEggColors = { 10236982, 5065037 };
+    public static final int[] spawnEggColors = { 4547222, 9433559 };
 
     public WispEntity(EntityType<? extends WispEntity> entityType, World world) {
         super(entityType, world);

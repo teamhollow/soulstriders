@@ -44,7 +44,7 @@ public class SoulMothEntity extends PathAwareEntity {
         .makeFireImmune()
         .setDimensions(0.07F, 0.07F)
         .maxTrackingRange(5);
-    public static final int[] spawnEggColors = { 10236982, 5065037 };
+    public static final int[] spawnEggColors = { 99999999, 9433559 };
 
     private BlockPos targetPos;
 

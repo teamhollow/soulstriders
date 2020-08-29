@@ -88,7 +88,7 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
         .create(SoulStriderEntity::new, SpawnGroup.CREATURE)
         .setDimensions(0.9F, 1.7F)
         .maxTrackingRange(10);
-    public static final int[] spawnEggColors = { 10236982, 5065037 };
+    public static final int[] spawnEggColors = { 5065037, 9433559 };
 
     private static final Ingredient BREEDING_INGREDIENT;
     private static final Ingredient ATTRACTING_INGREDIENT;
