@@ -26,8 +26,9 @@ public class SoulStriders implements ModInitializer {
     public void onInitialize() {
         log("Initializing");
 
-        new SSEntities();
         new SSItems();
+        new SSBlocks();
+        new SSEntities();
 
         log("Initialized");
     }
@@ -39,7 +40,7 @@ public class SoulStriders implements ModInitializer {
         log(Level.INFO, message);
     }
 
-	public static Identifier texture(String path) {
-		return new Identifier(MOD_ID, "textures/" + path + ".png");
-	}
+    public static Identifier texture(String path) {
+        return new Identifier(MOD_ID, "textures/" + path + ".png");
+    }
 }

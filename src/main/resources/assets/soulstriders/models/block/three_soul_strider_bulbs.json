@@ -1,0 +1,51 @@
+{
+    "parent": "minecraft:block/block",
+    "textures": {
+        "texture": "soulstriders:entity/soul_strider/soul_strider",
+        "particle": "soulstriders:item/soul_strider_bulb"
+    },
+    "elements": [
+        {
+            "name": "bulb",
+            "from": [3, 0, 7],
+            "to": [7, 4, 11],
+            "rotation": {"angle": 0, "axis": "y", "origin": [3, 0, 7]},
+            "faces": {
+                "north": {"uv": [0.5, 0.5, 1, 1], "texture": "#texture"},
+                "east": {"uv": [0, 0.5, 0.5, 1], "texture": "#texture"},
+                "south": {"uv": [1.5, 0.5, 2, 1], "texture": "#texture"},
+                "west": {"uv": [1, 0.5, 1.5, 1], "texture": "#texture"},
+                "up": {"uv": [1, 0.5, 0.5, 0], "texture": "#texture"},
+                "down": {"uv": [1.5, 0, 1, 0.5], "texture": "#texture"}
+            }
+        },
+        {
+            "name": "bulb",
+            "from": [5, 0, 2],
+            "to": [9, 4, 6],
+            "rotation": {"angle": 0, "axis": "y", "origin": [5, 0, 2]},
+            "faces": {
+                "north": {"uv": [0.5, 0.5, 1, 1], "texture": "#texture"},
+                "east": {"uv": [0, 0.5, 0.5, 1], "texture": "#texture"},
+                "south": {"uv": [1.5, 0.5, 2, 1], "texture": "#texture"},
+                "west": {"uv": [1, 0.5, 1.5, 1], "texture": "#texture"},
+                "up": {"uv": [1, 0.5, 0.5, 0], "texture": "#texture"},
+                "down": {"uv": [1.5, 0, 1, 0.5], "texture": "#texture"}
+            }
+        },
+        {
+            "name": "bulb",
+            "from": [10, 0, 9],
+            "to": [14, 4, 13],
+            "rotation": {"angle": 0, "axis": "y", "origin": [10, 0, 9]},
+            "faces": {
+                "north": {"uv": [0.5, 0.5, 1, 1], "texture": "#texture"},
+                "east": {"uv": [0, 0.5, 0.5, 1], "texture": "#texture"},
+                "south": {"uv": [1.5, 0.5, 2, 1], "texture": "#texture"},
+                "west": {"uv": [1, 0.5, 1.5, 1], "texture": "#texture"},
+                "up": {"uv": [1, 0.5, 0.5, 0], "texture": "#texture"},
+                "down": {"uv": [1.5, 0, 1, 0.5], "texture": "#texture"}
+            }
+        }
+    ]
+}

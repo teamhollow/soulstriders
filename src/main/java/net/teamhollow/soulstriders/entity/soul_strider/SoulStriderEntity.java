@@ -4,6 +4,7 @@ import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.Random;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import com.google.common.collect.Sets;
 import com.google.common.collect.UnmodifiableIterator;
@@ -20,10 +21,12 @@ import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ExperienceOrbEntity;
+import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.ItemSteerable;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.Saddleable;
 import net.minecraft.entity.SaddledComponent;
+import net.minecraft.entity.Shearable;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.TargetPredicate;
@@ -79,10 +82,11 @@ import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
 import net.minecraft.world.biome.Biomes;
 import net.teamhollow.soulstriders.entity.soul_moth.SoulMothEntity;
+import net.teamhollow.soulstriders.init.SSBlocks;
 import net.teamhollow.soulstriders.init.SSEntities;
 import net.teamhollow.soulstriders.init.SSItems;
 
-public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Saddleable {
+public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Saddleable, Shearable {
     public static final String id = "soul_strider";
     public static final EntityType.Builder<SoulStriderEntity> builder = EntityType.Builder
         .create(SoulStriderEntity::new, SpawnGroup.CREATURE)
@@ -512,8 +516,10 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
 
     @Override
     public ActionResult interactMob(PlayerEntity player, Hand hand) {
-        boolean playerHoldingBreedingItem = player.getStackInHand(hand).getItem() == SSItems.SOUL_MOTH_IN_A_BOTTLE;
-        if (!playerHoldingBreedingItem && this.isSaddled() && !this.hasPassengers()) {
+        ItemStack handStack = player.getStackInHand(hand);
+        boolean playerHoldingBreedingItem = handStack.getItem() == SSItems.SOUL_MOTH_IN_A_BOTTLE;
+        boolean playerHoldingShears = handStack.getItem() == Items.SHEARS;
+        if (!playerHoldingBreedingItem && !playerHoldingShears && this.isSaddled() && !this.hasPassengers()) {
             if (!this.world.isClient) {
                 player.startRiding(this);
             }
@@ -522,16 +528,29 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
         } else {
             ActionResult actionResult = super.interactMob(player, hand);
             if (!actionResult.isAccepted()) {
-                ItemStack itemStack = player.getStackInHand(hand);
-                return itemStack.getItem() == Items.SADDLE ? itemStack.useOnEntity(player, this, hand) : ActionResult.PASS;
-            } else {
-                if (playerHoldingBreedingItem && !this.isSilent()) {
-                    this.world.playSound((PlayerEntity) null, this.getX(), this.getY(), this.getZ(), SoundEvents.ENTITY_STRIDER_EAT, this.getSoundCategory(), 1.0F, 1.0F + (this.random.nextFloat() - this.random.nextFloat()) * 0.2F);
-                    player.setStackInHand(hand, new ItemStack(Items.GLASS_BOTTLE));
+                if (playerHoldingShears) {
+                    if (!this.world.isClient && this.isShearable()) {
+                        this.sheared(SoundCategory.PLAYERS);
+                        handStack.damage(1, (LivingEntity) player, (Consumer<LivingEntity>) ((playerEntity) -> {
+                            playerEntity.sendToolBreakStatus(hand);
+                        }));
+
+                        return ActionResult.SUCCESS;
+                    } else
+                        return ActionResult.CONSUME;
                 }
 
-                return actionResult;
+                return handStack.getItem() == Items.SADDLE || playerHoldingShears ? handStack.useOnEntity(player, this, hand) : ActionResult.PASS;
+            } else if (!this.world.isClient) {
+                if (playerHoldingBreedingItem && !this.isSilent()) {
+                    this.world.playSound(player, this.getX(), this.getY(), this.getZ(), SoundEvents.ENTITY_STRIDER_EAT, this.getSoundCategory(), 1.0F, 1.0F + (this.random.nextFloat() - this.random.nextFloat()) * 0.2F);
+                }
+
+                if (!player.isCreative())
+                    player.setStackInHand(hand, new ItemStack(Items.GLASS_BOTTLE));
             }
+
+            return actionResult;
         }
     }
 
@@ -775,5 +794,29 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
                 return this.findTarget();
             }
         }
+    }
+
+    @Override
+    public void sheared(SoundCategory shearedSoundCategory) {
+        this.world.playSoundFromEntity((PlayerEntity) null, this, SoundEvents.ENTITY_SHEEP_SHEAR, shearedSoundCategory, 1.0F, 1.0F);
+
+        this.setNoBulbTicks(6000);
+        this.setBreedingAge(6000);
+
+        ItemEntity itemEntity = this.dropItem(SSBlocks.SOUL_STRIDER_BULB, 1);
+        if (itemEntity != null) {
+            itemEntity.setVelocity(
+                itemEntity.getVelocity().add(
+                    (this.random.nextFloat() - this.random.nextFloat()) * 0.1F,
+                    (this.random.nextFloat() * 0.05F),
+                    (this.random.nextFloat() - this.random.nextFloat()) * 0.1F
+                )
+            );
+        }
+    }
+
+    @Override
+    public boolean isShearable() {
+        return this.isAlive() && this.hasBulb() && !this.isBaby();
     }
 }

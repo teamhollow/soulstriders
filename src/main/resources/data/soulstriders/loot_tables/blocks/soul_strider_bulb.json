@@ -1,0 +1,66 @@
+{
+    "type": "minecraft:block",
+    "pools": [
+        {
+            "rolls": 1,
+            "entries": [
+                {
+                    "type": "minecraft:item",
+                    "functions": [
+                        {
+                            "function": "minecraft:set_count",
+                            "conditions": [
+                                {
+                                    "condition": "minecraft:block_state_property",
+                                    "block": "soulstriders:soul_strider_bulb",
+                                    "properties": {
+                                        "bulbs": "2"
+                                    }
+                                }
+                            ],
+                            "count": 2
+                        },
+                        {
+                            "function": "minecraft:set_count",
+                            "conditions": [
+                                {
+                                    "condition": "minecraft:block_state_property",
+                                    "block": "soulstriders:soul_strider_bulb",
+                                    "properties": {
+                                        "bulbs": "3"
+                                    }
+                                }
+                            ],
+                            "count": 3
+                        },
+                        {
+                            "function": "minecraft:set_count",
+                            "conditions": [
+                                {
+                                    "condition": "minecraft:block_state_property",
+                                    "block": "soulstriders:soul_strider_bulb",
+                                    "properties": {
+                                        "bulbs": "4"
+                                    }
+                                }
+                            ],
+                            "count": 4
+                        },
+                        {
+                            "function": "minecraft:explosion_decay"
+                        }
+                    ],
+                    "name": "soulstriders:soul_strider_bulb"
+                }
+            ],
+            "conditions": [
+                {
+                    "condition": "minecraft:match_tool",
+                    "predicate": {
+                        "item": "minecraft:shears"
+                    }
+                }
+            ]
+        }
+    ]
+}

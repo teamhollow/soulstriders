@@ -6,6 +6,7 @@ import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.render.entity.MobEntityRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.BlockPos;
 import net.teamhollow.soulstriders.init.SSEntities;
 
 @Environment(EnvType.CLIENT)
@@ -19,6 +20,11 @@ public class SoulMothEntityRenderer extends MobEntityRenderer<SoulMothEntity, So
     @Override
     public Identifier getTexture(SoulMothEntity entity) {
         return TEXTURE;
+    }
+
+    @Override
+    protected int getBlockLight(SoulMothEntity entity, BlockPos blockPos) {
+        return 15;
     }
 
     @Override

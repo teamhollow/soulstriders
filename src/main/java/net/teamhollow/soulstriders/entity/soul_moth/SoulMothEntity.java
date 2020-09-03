@@ -36,6 +36,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldView;
 import net.teamhollow.soulstriders.entity.soul_strider.SoulStriderEntity;
 import net.teamhollow.soulstriders.entity.wisp.WispEntity;
+import net.teamhollow.soulstriders.init.SSBlocks;
 import net.teamhollow.soulstriders.init.SSItems;
 
 public class SoulMothEntity extends PathAwareEntity {
@@ -81,11 +82,13 @@ public class SoulMothEntity extends PathAwareEntity {
 
         if (this.targetPos != null) {
             BlockState targetPosBlockState = world.getBlockState(targetPos);
-            if (!( targetPosBlockState.isOf(Blocks.TORCH)
+            if (!( targetPosBlockState.isOf(SSBlocks.SOUL_STRIDER_BULB)
+                || targetPosBlockState.isOf(Blocks.TORCH)
                 || targetPosBlockState.isOf(Blocks.WALL_TORCH)
                 || targetPosBlockState.isOf(Blocks.LANTERN)
-                || targetPosBlockState.isOf(Blocks.CAMPFIRE)
-            )) this.targetPos = null;
+                || (targetPosBlockState.isOf(Blocks.CAMPFIRE) && targetPosBlockState.get(CampfireBlock.LIT))
+                )
+            ) this.targetPos = null;
         }
 
         LivingEntity targetEntity = this.getTarget();
@@ -200,10 +203,11 @@ public class SoulMothEntity extends PathAwareEntity {
 
         protected boolean isTargetPos(WorldView world, BlockPos pos) {
             BlockState blockState = world.getBlockState(pos);
-
-            boolean isTargetPos = blockState.isOf(Blocks.TORCH) || blockState.isOf(Blocks.WALL_TORCH) || (blockState.isOf(Blocks.LANTERN) || (blockState.isOf(Blocks.CAMPFIRE) && !(blockState.get(CampfireBlock.LIT) && blockState.get(CampfireBlock.WATERLOGGED))));
-
-            return isTargetPos;
+            return blockState.isOf(SSBlocks.SOUL_STRIDER_BULB)
+                || blockState.isOf(Blocks.TORCH)
+                || blockState.isOf(Blocks.WALL_TORCH)
+                || blockState.isOf(Blocks.LANTERN)
+                || (blockState.isOf(Blocks.CAMPFIRE) && blockState.get(CampfireBlock.LIT));
         }
 
         public void tick() {
@@ -281,7 +285,11 @@ public class SoulMothEntity extends PathAwareEntity {
 
         protected boolean isTargetPos(WorldView world, BlockPos pos) {
             BlockState blockState = world.getBlockState(pos);
-            return blockState.isOf(Blocks.TORCH) || blockState.isOf(Blocks.WALL_TORCH) || (blockState.isOf(Blocks.LANTERN) || (blockState.isOf(Blocks.CAMPFIRE) && !(blockState.get(CampfireBlock.LIT) && blockState.get(CampfireBlock.WATERLOGGED))));
+            return blockState.isOf(SSBlocks.SOUL_STRIDER_BULB)
+                || blockState.isOf(Blocks.TORCH)
+                || blockState.isOf(Blocks.WALL_TORCH)
+                || blockState.isOf(Blocks.LANTERN)
+                || (blockState.isOf(Blocks.CAMPFIRE) && blockState.get(CampfireBlock.LIT));
         }
 
         public boolean shouldContinue() {

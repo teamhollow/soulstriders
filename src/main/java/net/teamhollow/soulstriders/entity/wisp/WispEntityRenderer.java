@@ -5,6 +5,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.render.entity.MobEntityRenderer;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.BlockPos;
 import net.teamhollow.soulstriders.init.SSEntities;
 
 @Environment(EnvType.CLIENT)
@@ -13,6 +14,11 @@ public class WispEntityRenderer extends MobEntityRenderer<WispEntity, WispEntity
 
     public WispEntityRenderer(EntityRenderDispatcher entityRenderDispatcher) {
         super(entityRenderDispatcher, new WispEntityModel<WispEntity>(), 0.25F);
+    }
+
+    @Override
+    protected int getBlockLight(WispEntity entity, BlockPos blockPos) {
+        return 15;
     }
 
     @Override
