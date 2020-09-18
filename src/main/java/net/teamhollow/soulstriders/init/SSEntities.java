@@ -1,6 +1,5 @@
 package net.teamhollow.soulstriders.init;
 
-import net.fabricmc.fabric.api.client.rendereregistry.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -36,23 +35,6 @@ public class SSEntities {
         registerDefaultAttributes(SOUL_STRIDER, SoulStriderEntity.createStriderAttributes());
         registerDefaultAttributes(WISP, WispEntity.createWispAttributes());
         registerDefaultAttributes(SOUL_MOTH, SoulMothEntity.createSoulMothAttributes());
-    }
-
-    public static void registerRenderers() {
-        EntityRendererRegistry INSTANCE = EntityRendererRegistry.INSTANCE;
-
-        INSTANCE.register(
-            SOUL_STRIDER,
-            (entityRenderDispatcher, context) -> new SoulStriderEntityRenderer(entityRenderDispatcher)
-        );
-        INSTANCE.register(
-            WISP,
-            (entityRenderDispatcher, context) -> new WispEntityRenderer(entityRenderDispatcher)
-        );
-        INSTANCE.register(
-            SOUL_MOTH,
-            (entityRenderDispatcher, context) -> new SoulMothEntityRenderer(entityRenderDispatcher)
-        );
     }
 
     private static <T extends Entity> EntityType<T> register(String id, EntityType.Builder<T> entityType,
