@@ -1,5 +1,7 @@
 package net.teamhollow.soulstriders.block;
 
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Random;
 
 import net.minecraft.block.Block;
@@ -28,7 +30,7 @@ import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
-import net.minecraft.world.biome.Biomes;
+import net.minecraft.world.biome.BiomeKeys;
 import net.teamhollow.soulstriders.entity.wisp.WispEntity;
 import net.teamhollow.soulstriders.init.SSEntities;
 import net.teamhollow.soulstriders.state.property.SSProperties;
@@ -51,7 +53,7 @@ public class SoulStriderBulbBlock extends Block implements Waterloggable {
 
     @Override
     public void randomTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
-        if (world.getBiome(pos) == Biomes.SOUL_SAND_VALLEY && world.getBlockState(pos.down()).isIn(BlockTags.SOUL_SPEED_BLOCKS)) {
+        if (Objects.equals(world.method_31081(pos), Optional.of(BiomeKeys.SOUL_SAND_VALLEY)) && world.getBlockState(pos.down()).isIn(BlockTags.SOUL_SPEED_BLOCKS)) {
             int hatch = state.get(HATCH);
             if (hatch < 2) {
                 world.playSound(null, pos, SoundEvents.ENTITY_TURTLE_EGG_CRACK, SoundCategory.BLOCKS, 0.7F, 0.9F + random.nextFloat() * 0.2F);

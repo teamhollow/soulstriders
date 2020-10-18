@@ -20,11 +20,6 @@ public class WispEntityModel<T extends WispEntity> extends CompositeEntityModel<
         wisp.setTextureOffset(0, 0).addCuboid(-1.5F, -3.5F, -12.5F, 7.0F, 7.0F, 13.0F, 0.0F, false);
     }
 
-    @Override
-    public void setAngles(T entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
-        // previously the render function, render code was moved to a method below
-    }
-
     public void setRotationAngle(ModelPart bone, float x, float y, float z) {
         bone.pitch = x;
         bone.yaw = y;
@@ -35,4 +30,7 @@ public class WispEntityModel<T extends WispEntity> extends CompositeEntityModel<
     public Iterable<ModelPart> getParts() {
         return ImmutableList.of(wisp);
     }
+
+    @Override
+    public void setAngles(T entity, float limbAngle, float limbDistance, float animationProgress, float headYaw, float headPitch) {}
 }

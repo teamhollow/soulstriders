@@ -2,6 +2,8 @@ package net.teamhollow.soulstriders.entity.soul_strider;
 
 import java.util.EnumSet;
 import java.util.Iterator;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -20,6 +22,7 @@ import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.ItemSteerable;
@@ -51,7 +54,6 @@ import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.entity.mob.ZombieEntity;
-import net.minecraft.entity.mob.ZombifiedPiglinEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -62,6 +64,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
@@ -77,10 +80,11 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.LocalDifficulty;
+import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
-import net.minecraft.world.biome.Biomes;
+import net.minecraft.world.biome.BiomeKeys;
 import net.teamhollow.soulstriders.entity.soul_moth.SoulMothEntity;
 import net.teamhollow.soulstriders.init.SSBlocks;
 import net.teamhollow.soulstriders.init.SSEntities;
@@ -208,11 +212,6 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
     }
 
     @Override
-    public Box getHardCollisionBox(Entity collidingEntity) {
-        return collidingEntity.isPushable() ? collidingEntity.getBoundingBox() : null;
-    }
-
-    @Override
     public boolean isPushable() {
         return true;
     }
@@ -289,7 +288,7 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
 
             while (poseIter.hasNext()) {
                 EntityPose entityPose = (EntityPose) poseIter.next();
-                y = this.world.getCollisionHeightAt(blockPos);
+                y = this.world.getDismountHeight(blockPos);
                 if (Dismounting.canDismountInBlock(y)) {
                     Box box = passenger.getBoundingBox(entityPose);
                     Vec3d vec3d2 = Vec3d.ofCenter(blockPos, y);
@@ -344,7 +343,7 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
 
     public boolean isNearSouls() {
         BlockPos pos = this.getBlockPos();
-        return this.isOnSoulBlock(pos) || this.world.getBiome(pos) == Biomes.SOUL_SAND_VALLEY;
+        return this.isOnSoulBlock(pos) || Objects.equals(world.method_31081(pos), Optional.of(BiomeKeys.SOUL_SAND_VALLEY));
     }
 
     public boolean isOnSoulBlock(BlockPos pos) {
@@ -457,7 +456,7 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
     }
 
     @Override
-    public void breed(World world, AnimalEntity other) {
+    public void breed(ServerWorld world, AnimalEntity other) {
         PassiveEntity wisp = SSEntities.WISP.create(world);
         if (wisp != null) {
             ServerPlayerEntity serverPlayerEntity = this.getLovingPlayer();
@@ -561,52 +560,31 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
     }
 
     @Override
-    public EntityData initialize(WorldAccess world, LocalDifficulty difficulty, SpawnReason spawnReason, EntityData entityData, CompoundTag entityTag) {
-        EntityData entityData2 = null;
-        SoulStriderEntity.StriderData.RiderType riderType4;
-        if (entityData instanceof SoulStriderEntity.StriderData) {
-            riderType4 = ((SoulStriderEntity.StriderData) entityData).type;
-        } else if (!this.isBaby()) {
-            if (this.random.nextInt(30) == 0) {
-                riderType4 = SoulStriderEntity.StriderData.RiderType.PIGLIN_RIDER;
-                entityData2 = new ZombieEntity.ZombieData(ZombieEntity.method_29936(this.random), false);
-            } else if (this.random.nextInt(10) == 0) {
-                riderType4 = SoulStriderEntity.StriderData.RiderType.BABY_RIDER;
-            } else {
-                riderType4 = SoulStriderEntity.StriderData.RiderType.NO_RIDER;
-            }
-
-            entityData = new SoulStriderEntity.StriderData(riderType4);
-            ((PassiveEntity.PassiveData) entityData)
-                    .setBabyChance(riderType4 == SoulStriderEntity.StriderData.RiderType.NO_RIDER ? 0.5F : 0.0F);
+    public EntityData initialize(ServerWorldAccess world, LocalDifficulty difficulty, SpawnReason spawnReason, EntityData entityData, CompoundTag entityTag) {
+        if (this.isBaby()) {
+            return super.initialize(world, difficulty, spawnReason, entityData, entityTag);
         } else {
-            riderType4 = SoulStriderEntity.StriderData.RiderType.NO_RIDER;
-        }
-
-        MobEntity mobEntity = null;
-        if (riderType4 == SoulStriderEntity.StriderData.RiderType.BABY_RIDER) {
-            SoulStriderEntity striderEntity = SSEntities.SOUL_STRIDER.create(world.getWorld());
-            if (striderEntity != null) {
-                mobEntity = striderEntity;
-                striderEntity.setBreedingAge(-24000);
-            }
-        } else if (riderType4 == SoulStriderEntity.StriderData.RiderType.PIGLIN_RIDER) {
-            ZombifiedPiglinEntity zombifiedPiglinEntity = (ZombifiedPiglinEntity) EntityType.ZOMBIFIED_PIGLIN
-                    .create(world.getWorld());
-            if (zombifiedPiglinEntity != null) {
-                mobEntity = zombifiedPiglinEntity;
+            if (this.random.nextInt(30) == 0) {
+                MobEntity mobEntity = (MobEntity) EntityType.ZOMBIFIED_PIGLIN.create(world.toServerWorld());
+                entityData = this.method_30336(world, difficulty, mobEntity, new ZombieEntity.ZombieData(ZombieEntity.method_29936(this.random), false));
+                mobEntity.equipStack(EquipmentSlot.MAINHAND, new ItemStack(Items.WARPED_FUNGUS_ON_A_STICK));
                 this.saddle((SoundCategory) null);
+            } else if (this.random.nextInt(10) == 0) {
+                PassiveEntity passiveEntity = (PassiveEntity) EntityType.STRIDER.create(world.toServerWorld());
+                passiveEntity.setBreedingAge(-24000);
+                entityData = this.method_30336(world, difficulty, passiveEntity, (EntityData) null);
+            } else {
+                entityData = new PassiveEntity.PassiveData(0.5F);
             }
-        }
 
-        if (mobEntity != null) {
-            ((MobEntity) mobEntity).refreshPositionAndAngles(this.getX(), this.getY(), this.getZ(), this.yaw, 0.0F);
-            ((MobEntity) mobEntity).initialize(world, difficulty, SpawnReason.JOCKEY, entityData2, (CompoundTag) null);
-            ((MobEntity) mobEntity).startRiding(this, true);
-            world.spawnEntity((Entity) mobEntity);
+            return super.initialize(world, difficulty, spawnReason, (EntityData) entityData, entityTag);
         }
-
-        return super.initialize(world, difficulty, spawnReason, (EntityData) entityData, entityTag);
+    }
+    private EntityData method_30336(ServerWorldAccess serverWorldAccess, LocalDifficulty localDifficulty, MobEntity mobEntity, EntityData entityData) {
+        mobEntity.refreshPositionAndAngles(this.getX(), this.getY(), this.getZ(), this.yaw, 0.0F);
+        mobEntity.initialize(serverWorldAccess, localDifficulty, SpawnReason.JOCKEY, entityData, (CompoundTag) null);
+        mobEntity.startRiding(this, true);
+        return new PassiveEntity.PassiveData(0.0F);
     }
 
     static {
@@ -638,24 +616,12 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
 
         @Override
         public boolean isValidPosition(BlockPos pos) {
-            return this.world.getBlockState(pos).isIn(BlockTags.SOUL_SPEED_BLOCKS) || this.world.getBlockState(pos.down()).isIn(BlockTags.SOUL_SPEED_BLOCKS) || this.world.getBiome(pos) == Biomes.SOUL_SAND_VALLEY || super.isValidPosition(pos);
-        }
-    }
-
-    public static class StriderData extends PassiveEntity.PassiveData {
-        public final SoulStriderEntity.StriderData.RiderType type;
-
-        public StriderData(SoulStriderEntity.StriderData.RiderType type) {
-            this.type = type;
-        }
-
-        public static enum RiderType {
-            NO_RIDER, BABY_RIDER, PIGLIN_RIDER;
+            return this.world.getBlockState(pos).isIn(BlockTags.SOUL_SPEED_BLOCKS) || this.world.getBlockState(pos.down()).isIn(BlockTags.SOUL_SPEED_BLOCKS) || Objects.equals(world.method_31081(pos), Optional.of(BiomeKeys.SOUL_SAND_VALLEY)) || super.isValidPosition(pos);
         }
     }
 
     @Override
-    public PassiveEntity createChild(PassiveEntity mate) {
+    public PassiveEntity createChild(ServerWorld world, PassiveEntity mate) {
         return null;
     }
 

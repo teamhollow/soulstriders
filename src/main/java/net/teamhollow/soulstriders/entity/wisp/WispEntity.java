@@ -17,6 +17,7 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
@@ -65,7 +66,7 @@ public class WispEntity extends PassiveEntity {
             SoulStriderEntity soulStrider = SSEntities.SOUL_STRIDER.create(this.world);
             if (soulStrider != null) {
                 soulStrider.refreshPositionAndAngles(this.getX(), this.getY(), this.getZ(), this.yaw, this.pitch);
-                soulStrider.initialize(this.world, this.world.getLocalDifficulty(soulStrider.getBlockPos()), SpawnReason.BREEDING, (EntityData) null, (CompoundTag) null);
+                soulStrider.initialize((ServerWorld)this.world, this.world.getLocalDifficulty(soulStrider.getBlockPos()), SpawnReason.BREEDING, (EntityData) null, (CompoundTag) null);
                 soulStrider.setAiDisabled(this.isAiDisabled());
                 if (this.hasCustomName()) {
                     soulStrider.setCustomName(this.getCustomName());
@@ -175,7 +176,7 @@ public class WispEntity extends PassiveEntity {
     }
 
     @Override
-    public PassiveEntity createChild(PassiveEntity mate) {
+    public PassiveEntity createChild(ServerWorld world, PassiveEntity mate) {
         return null;
     }
 }

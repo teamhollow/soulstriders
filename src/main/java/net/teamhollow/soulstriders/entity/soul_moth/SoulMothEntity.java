@@ -131,7 +131,7 @@ public class SoulMothEntity extends PathAwareEntity {
         ItemStack itemStack = player.getStackInHand(hand);
         if (itemStack.getItem() == Items.GLASS_BOTTLE) {
             player.playSound(SoundEvents.BLOCK_BEEHIVE_ENTER, 1.0F, 1.0F);
-            ItemStack itemStack2 = ItemUsage.method_30012(itemStack, player, SSItems.SOUL_MOTH_IN_A_BOTTLE.getStackForRender());
+            ItemStack itemStack2 = ItemUsage.method_30012(itemStack, player, SSItems.SOUL_MOTH_IN_A_BOTTLE.getDefaultStack());
             player.setStackInHand(hand, itemStack2);
 
             this.remove();
@@ -267,7 +267,7 @@ public class SoulMothEntity extends PathAwareEntity {
         public boolean canStart() {
             double localEntityRange = 2.0D;
 
-            return super.canStart() && mob.world.getEntities(
+            return super.canStart() && mob.world.getOtherEntities(
                 mob,
                 new Box(
                     mob.getX() - localEntityRange, mob.getY() - localEntityRange, mob.getZ() - localEntityRange,
