@@ -45,7 +45,6 @@ import net.minecraft.entity.ai.pathing.LandPathNodeMaker;
 import net.minecraft.entity.ai.pathing.MobNavigation;
 import net.minecraft.entity.ai.pathing.PathNodeNavigator;
 import net.minecraft.entity.ai.pathing.PathNodeType;
-import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
@@ -412,12 +411,6 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
     @Override
     protected boolean movesIndependently() {
         return true;
-    }
-
-    public static DefaultAttributeContainer.Builder createStriderAttributes() {
-        return MobEntity.createMobAttributes()
-            .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.17499999701976776D)
-            .add(EntityAttributes.GENERIC_FOLLOW_RANGE, 16.0D);
     }
 
     @Override

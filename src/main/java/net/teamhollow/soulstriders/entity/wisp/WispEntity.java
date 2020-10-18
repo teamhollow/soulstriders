@@ -7,14 +7,10 @@ import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SpawnGroup;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.goal.FollowTargetGoal;
 import net.minecraft.entity.ai.goal.LookAtEntityGoal;
-import net.minecraft.entity.attribute.DefaultAttributeContainer;
-import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.world.ServerWorld;
@@ -29,11 +25,6 @@ import net.teamhollow.soulstriders.init.SSEntities;
 
 public class WispEntity extends PassiveEntity {
     public static final String id = "wisp";
-    public static final EntityType.Builder<WispEntity> builder = EntityType.Builder
-        .create(WispEntity::new, SpawnGroup.AMBIENT)
-        .makeFireImmune()
-        .setDimensions(0.5F, 0.5F)
-        .maxTrackingRange(5);
     public static final int[] spawnEggColors = { 4547222, 9433559 };
 
     public WispEntity(EntityType<? extends WispEntity> entityType, World world) {
@@ -147,10 +138,6 @@ public class WispEntity extends PassiveEntity {
 
     @Override
     protected void tickCramming() {}
-
-    public static DefaultAttributeContainer.Builder createWispAttributes() {
-        return MobEntity.createMobAttributes().add(EntityAttributes.GENERIC_MAX_HEALTH, 6.0D);
-    }
 
     @Override
     protected boolean canClimb() {

@@ -10,13 +10,9 @@ import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SpawnGroup;
 import net.minecraft.entity.ai.goal.FollowTargetGoal;
 import net.minecraft.entity.ai.goal.LookAtEntityGoal;
 import net.minecraft.entity.ai.goal.MoveToTargetPosGoal;
-import net.minecraft.entity.attribute.DefaultAttributeContainer;
-import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -41,11 +37,6 @@ import net.teamhollow.soulstriders.init.SSItems;
 
 public class SoulMothEntity extends PathAwareEntity {
     public static final String id = "soul_moth";
-    public static final EntityType.Builder<SoulMothEntity> builder = EntityType.Builder
-        .create(SoulMothEntity::new, SpawnGroup.AMBIENT)
-        .makeFireImmune()
-        .setDimensions(0.07F, 0.07F)
-        .maxTrackingRange(5);
     public static final int[] spawnEggColors = { 99999999, 9433559 };
 
     private BlockPos targetPos;
@@ -156,10 +147,6 @@ public class SoulMothEntity extends PathAwareEntity {
 
     @Override
     protected void tickCramming() {}
-
-    public static DefaultAttributeContainer.Builder createSoulMothAttributes() {
-        return MobEntity.createMobAttributes().add(EntityAttributes.GENERIC_MAX_HEALTH, 1.0D);
-    }
 
     @Override
     protected boolean canClimb() {
