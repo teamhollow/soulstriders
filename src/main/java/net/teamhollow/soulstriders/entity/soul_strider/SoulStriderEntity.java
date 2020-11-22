@@ -563,7 +563,7 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
                 mobEntity.equipStack(EquipmentSlot.MAINHAND, new ItemStack(Items.WARPED_FUNGUS_ON_A_STICK));
                 this.saddle((SoundCategory) null);
             } else if (this.random.nextInt(10) == 0) {
-                PassiveEntity passiveEntity = (PassiveEntity) EntityType.STRIDER.create(world.toServerWorld());
+                PassiveEntity passiveEntity = (PassiveEntity) SSEntities.SOUL_STRIDER.create(world.toServerWorld());
                 passiveEntity.setBreedingAge(-24000);
                 entityData = this.method_30336(world, difficulty, passiveEntity, (EntityData) null);
             } else {
