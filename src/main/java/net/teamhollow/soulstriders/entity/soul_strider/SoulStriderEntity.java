@@ -97,15 +97,15 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
         .maxTrackingRange(10);
     public static final int[] spawnEggColors = { 5065037, 9433559 };
 
-    private static final Ingredient BREEDING_INGREDIENT;
-    private static final Ingredient ATTRACTING_INGREDIENT;
-    private static final TrackedData<Integer> BOOST_TIME;
-    private static final TrackedData<Boolean> SOUL_SURROUNDED;
-    private static final TrackedData<Boolean> HIDING;
-    private static final TrackedData<Integer> NO_BULB_TICKS;
-    private static final TrackedData<Boolean> SADDLED;
+    private static final Ingredient BREEDING_INGREDIENT = Ingredient.ofItems(SSItems.SOUL_MOTH_IN_A_BOTTLE);
+    private static final Ingredient ATTRACTING_INGREDIENT = Ingredient.ofItems(SSItems.SOUL_MOTH_IN_A_BOTTLE, SSItems.SOUL_MOTH_ON_A_STICK);
+    private static final TrackedData<Integer> BOOST_TIME = DataTracker.registerData(SoulStriderEntity.class, TrackedDataHandlerRegistry.INTEGER);
+    private static final TrackedData<Boolean> SOUL_SURROUNDED = DataTracker.registerData(SoulStriderEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+    private static final TrackedData<Boolean> HIDING = DataTracker.registerData(SoulStriderEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+    private static final TrackedData<Integer> NO_BULB_TICKS = DataTracker.registerData(SoulStriderEntity.class, TrackedDataHandlerRegistry.INTEGER);
+    private static final TrackedData<Boolean> SADDLED = DataTracker.registerData(SoulStriderEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private final SaddledComponent saddledComponent;
-    private static final TargetPredicate CLOSE_PLAYER_PREDICATE;
+    private static final TargetPredicate CLOSE_PLAYER_PREDICATE = new TargetPredicate().setBaseMaxDistance(8.0D).includeTeammates();
     private TemptGoal temptGoal;
     private EscapeDangerGoal escapeDangerGoal;
 
@@ -578,17 +578,6 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
         mobEntity.initialize(serverWorldAccess, localDifficulty, SpawnReason.JOCKEY, entityData, (CompoundTag) null);
         mobEntity.startRiding(this, true);
         return new PassiveEntity.PassiveData(0.0F);
-    }
-
-    static {
-        BREEDING_INGREDIENT = Ingredient.ofItems(SSItems.SOUL_MOTH_IN_A_BOTTLE);
-        ATTRACTING_INGREDIENT = Ingredient.ofItems(SSItems.SOUL_MOTH_IN_A_BOTTLE, SSItems.SOUL_MOTH_ON_A_STICK);
-        BOOST_TIME = DataTracker.registerData(SoulStriderEntity.class, TrackedDataHandlerRegistry.INTEGER);
-        SOUL_SURROUNDED = DataTracker.registerData(SoulStriderEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
-        HIDING = DataTracker.registerData(SoulStriderEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
-        NO_BULB_TICKS = DataTracker.registerData(SoulStriderEntity.class, TrackedDataHandlerRegistry.INTEGER);
-        SADDLED = DataTracker.registerData(SoulStriderEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
-        CLOSE_PLAYER_PREDICATE = new TargetPredicate().setBaseMaxDistance(8.0D).includeTeammates();
     }
 
     static class Navigation extends MobNavigation {

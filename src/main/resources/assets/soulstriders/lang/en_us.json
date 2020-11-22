@@ -1,5 +1,6 @@
 {
     "mod.soulstriders.name": "Soul Striders",
+    "mod.soulstriders.description": "Striders that stride over souls",
     "itemGroup.soulstriders.item_group": "Soul Striders",
 
     "entity.soulstriders.soul_strider": "Soul Strider",
