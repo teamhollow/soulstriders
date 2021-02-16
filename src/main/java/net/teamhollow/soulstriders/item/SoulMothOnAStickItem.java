@@ -2,7 +2,6 @@ package net.teamhollow.soulstriders.item;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemSteerable;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -12,8 +11,6 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
 import net.teamhollow.soulstriders.init.SSEntities;
-
-import java.util.function.Consumer;
 
 public class SoulMothOnAStickItem extends Item {
     public SoulMothOnAStickItem(Item.Settings settings) {
@@ -28,7 +25,7 @@ public class SoulMothOnAStickItem extends Item {
             if (user.hasVehicle() && entity instanceof ItemSteerable && entity.getType() == SSEntities.SOUL_STRIDER) {
                 ItemSteerable itemSteerable = (ItemSteerable) entity;
                 if (itemSteerable.consumeOnAStickItem()) {
-                    itemStack.damage(1, user, (Consumer<LivingEntity>) ((p) -> p.sendToolBreakStatus(hand)));
+                    itemStack.damage(1, user, p -> p.sendToolBreakStatus(hand));
                     if (itemStack.isEmpty()) {
                         ItemStack itemStack2 = new ItemStack(Items.FISHING_ROD);
                         itemStack2.setTag(itemStack.getTag());
