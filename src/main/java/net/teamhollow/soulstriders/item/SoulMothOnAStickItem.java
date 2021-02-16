@@ -11,19 +11,13 @@ import net.minecraft.stat.Stats;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
-import net.teamhollow.soulstriders.SoulStriders;
 import net.teamhollow.soulstriders.init.SSEntities;
 
 import java.util.function.Consumer;
 
 public class SoulMothOnAStickItem extends Item {
-    public SoulMothOnAStickItem() {
-        super(
-            new Item.Settings()
-                .maxDamage(35)
-                .fireproof()
-                .group(SoulStriders.ITEM_GROUP)
-        );
+    public SoulMothOnAStickItem(Item.Settings settings) {
+        super(settings);
     }
 
     @Override

@@ -6,7 +6,6 @@ import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.state.StateManager;
@@ -41,8 +40,8 @@ public class SoulStriderBulbBlock extends Block implements Waterloggable {
     protected static final VoxelShape THREE_BULBS_SHAPE = Block.createCuboidShape(2.0D, 0.0D, 2.0D, 14.0D, 4.0D, 14.0D);
     protected static final VoxelShape FOUR_BULBS_SHAPE = Block.createCuboidShape(2.0D, 0.0D, 2.0D, 14.0D, 8.0D, 14.0D);
 
-    public SoulStriderBulbBlock() {
-        super(Settings.of(Material.STONE, MaterialColor.STONE).ticksRandomly().strength(0.5F).nonOpaque().sounds(BlockSoundGroup.STONE));
+    public SoulStriderBulbBlock(AbstractBlock.Settings settings) {
+        super(settings);
         this.setDefaultState(this.stateManager.getDefaultState().with(BULBS, 1).with(HATCH, 0));
     }
 

@@ -13,7 +13,7 @@ public class WispEntityRenderer extends MobEntityRenderer<WispEntity, WispEntity
     private static final Identifier TEXTURE = SSEntities.texture("wisp/wisp");
 
     public WispEntityRenderer(EntityRenderDispatcher entityRenderDispatcher) {
-        super(entityRenderDispatcher, new WispEntityModel<WispEntity>(), 0.25F);
+        super(entityRenderDispatcher, new WispEntityModel<>(), 0.25F);
     }
 
     @Override

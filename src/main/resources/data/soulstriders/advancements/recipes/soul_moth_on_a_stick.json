@@ -1,0 +1,32 @@
+{
+  "parent": "soulstriders:recipes/root",
+  "rewards": {
+    "recipes": [
+      "soulstriders:soul_moth_on_a_stick"
+    ]
+  },
+  "criteria": {
+    "has_soul_moth_in_a_bottle": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "soulstriders:soul_moth_in_a_bottle"
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "soulstriders:soul_moth_on_a_stick"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_soul_moth_in_a_bottle",
+      "has_the_recipe"
+    ]
+  ]
+}

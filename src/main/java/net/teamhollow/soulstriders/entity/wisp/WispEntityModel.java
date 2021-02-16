@@ -1,7 +1,6 @@
 package net.teamhollow.soulstriders.entity.wisp;
 
 import com.google.common.collect.ImmutableList;
-
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.model.ModelPart;
@@ -18,12 +17,6 @@ public class WispEntityModel<T extends WispEntity> extends CompositeEntityModel<
         wisp = new ModelPart(this);
         wisp.setPivot(-1.5F, 20.5F, 6.5F);
         wisp.setTextureOffset(0, 0).addCuboid(-1.5F, -3.5F, -12.5F, 7.0F, 7.0F, 13.0F, 0.0F, false);
-    }
-
-    public void setRotationAngle(ModelPart bone, float x, float y, float z) {
-        bone.pitch = x;
-        bone.yaw = y;
-        bone.roll = z;
     }
 
     @Override

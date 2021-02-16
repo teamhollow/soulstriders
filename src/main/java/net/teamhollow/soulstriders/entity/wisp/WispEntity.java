@@ -1,13 +1,7 @@
 package net.teamhollow.soulstriders.entity.wisp;
 
 import net.minecraft.block.BlockState;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityData;
-import net.minecraft.entity.EntityDimensions;
-import net.minecraft.entity.EntityPose;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SpawnReason;
+import net.minecraft.entity.*;
 import net.minecraft.entity.ai.goal.FollowTargetGoal;
 import net.minecraft.entity.ai.goal.LookAtEntityGoal;
 import net.minecraft.entity.damage.DamageSource;
@@ -25,7 +19,6 @@ import net.teamhollow.soulstriders.init.SSEntities;
 
 public class WispEntity extends PassiveEntity {
     public static final String id = "wisp";
-    public static final int[] spawnEggColors = { 4547222, 9433559 };
 
     public WispEntity(EntityType<? extends WispEntity> entityType, World world) {
         super(entityType, world);
@@ -36,7 +29,7 @@ public class WispEntity extends PassiveEntity {
         super.initGoals();
 
         this.goalSelector.add(8, new LookAtEntityGoal(this, SoulStriderEntity.class, 16.0F));
-        this.targetSelector.add(2, new FollowTargetGoal<SoulStriderEntity>(this, SoulStriderEntity.class, true));
+        this.targetSelector.add(2, new FollowTargetGoal<>(this, SoulStriderEntity.class, true));
     }
 
     @Override
@@ -57,7 +50,7 @@ public class WispEntity extends PassiveEntity {
             SoulStriderEntity soulStrider = SSEntities.SOUL_STRIDER.create(this.world);
             if (soulStrider != null) {
                 soulStrider.refreshPositionAndAngles(this.getX(), this.getY(), this.getZ(), this.yaw, this.pitch);
-                soulStrider.initialize((ServerWorld)this.world, this.world.getLocalDifficulty(soulStrider.getBlockPos()), SpawnReason.BREEDING, (EntityData) null, (CompoundTag) null);
+                soulStrider.initialize((ServerWorld)this.world, this.world.getLocalDifficulty(soulStrider.getBlockPos()), SpawnReason.BREEDING, null, null);
                 soulStrider.setAiDisabled(this.isAiDisabled());
                 if (this.hasCustomName()) {
                     soulStrider.setCustomName(this.getCustomName());

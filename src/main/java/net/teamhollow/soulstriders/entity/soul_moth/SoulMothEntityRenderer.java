@@ -14,7 +14,7 @@ public class SoulMothEntityRenderer extends MobEntityRenderer<SoulMothEntity, So
     private static final Identifier TEXTURE = SSEntities.texture("soul_moth/soul_moth");
 
     public SoulMothEntityRenderer(EntityRenderDispatcher entityRenderDispatcher) {
-        super(entityRenderDispatcher, new SoulMothEntityModel<SoulMothEntity>(), 0);
+        super(entityRenderDispatcher, new SoulMothEntityModel<>(), 0);
     }
 
     @Override

@@ -1,15 +1,7 @@
 package net.teamhollow.soulstriders.entity.soul_moth;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.CampfireBlock;
-import net.minecraft.block.LanternBlock;
-import net.minecraft.block.WallTorchBlock;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityDimensions;
-import net.minecraft.entity.EntityPose;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.block.*;
+import net.minecraft.entity.*;
 import net.minecraft.entity.ai.goal.FollowTargetGoal;
 import net.minecraft.entity.ai.goal.LookAtEntityGoal;
 import net.minecraft.entity.ai.goal.MoveToTargetPosGoal;
@@ -37,7 +29,6 @@ import net.teamhollow.soulstriders.init.SSItems;
 
 public class SoulMothEntity extends PathAwareEntity {
     public static final String id = "soul_moth";
-    public static final int[] spawnEggColors = { 99999999, 9433559 };
 
     private BlockPos targetPos;
 
@@ -52,8 +43,8 @@ public class SoulMothEntity extends PathAwareEntity {
         this.goalSelector.add(2, new LookAtEntityGoal(this, WispEntity.class, 16.0F));
         this.goalSelector.add(1, new SoulMothEntity.TargetSoulifiableBlock(1.5D, 14, 8));
         this.goalSelector.add(1, new SoulMothEntity.SoulifyBlockGoal(1.5D, 2, 2));
-        this.targetSelector.add(2, new FollowTargetGoal<WispEntity>(this, WispEntity.class, true));
-        this.targetSelector.add(2, new FollowTargetGoal<SoulStriderEntity>(this, SoulStriderEntity.class, true));
+        this.targetSelector.add(2, new FollowTargetGoal<>(this, WispEntity.class, true));
+        this.targetSelector.add(2, new FollowTargetGoal<>(this, SoulStriderEntity.class, true));
     }
 
     @Override
@@ -180,14 +171,17 @@ public class SoulMothEntity extends PathAwareEntity {
             this.range = range;
         }
 
+        @Override
         public double getDesiredSquaredDistanceToTarget() {
             return 1.5D;
         }
 
+        @Override
         public boolean shouldResetPath() {
             return this.tryingTime % 100 == 0;
         }
 
+        @Override
         protected boolean isTargetPos(WorldView world, BlockPos pos) {
             BlockState blockState = world.getBlockState(pos);
             return blockState.isOf(SSBlocks.SOUL_STRIDER_BULB)
@@ -197,6 +191,7 @@ public class SoulMothEntity extends PathAwareEntity {
                 || (blockState.isOf(Blocks.CAMPFIRE) && blockState.get(CampfireBlock.LIT));
         }
 
+        @Override
         public void tick() {
             if (this.hasReached()) {
                 if (this.timer >= 40) {
@@ -240,10 +235,12 @@ public class SoulMothEntity extends PathAwareEntity {
             }
         }
 
+        @Override
         public void start() {
             this.timer = 0;
             super.start();
         }
+        @Override
         public void stop() {
             SoulMothEntity entity = (SoulMothEntity) mob;
             entity.targetPos = null;
@@ -251,6 +248,7 @@ public class SoulMothEntity extends PathAwareEntity {
             super.stop();
         }
 
+        @Override
         public boolean canStart() {
             double localEntityRange = 2.0D;
 
@@ -270,6 +268,7 @@ public class SoulMothEntity extends PathAwareEntity {
             super(SoulMothEntity.this, speed, range, maxYDifference);
         }
 
+        @Override
         protected boolean isTargetPos(WorldView world, BlockPos pos) {
             BlockState blockState = world.getBlockState(pos);
             return blockState.isOf(SSBlocks.SOUL_STRIDER_BULB)
@@ -279,10 +278,12 @@ public class SoulMothEntity extends PathAwareEntity {
                 || (blockState.isOf(Blocks.CAMPFIRE) && blockState.get(CampfireBlock.LIT));
         }
 
+        @Override
         public boolean shouldContinue() {
             return false;
         }
 
+        @Override
         public void start() {
             this.timer = 0;
 

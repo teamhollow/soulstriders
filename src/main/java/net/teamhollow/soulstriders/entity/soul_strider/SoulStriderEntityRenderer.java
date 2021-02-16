@@ -11,23 +11,14 @@ import net.teamhollow.soulstriders.init.SSEntities;
 
 @Environment(EnvType.CLIENT)
 public class SoulStriderEntityRenderer extends MobEntityRenderer<SoulStriderEntity, SoulStriderEntityModel<SoulStriderEntity>> {
-    private static final Identifier TEXTURE = SSEntities.texture("soul_strider/soul_strider");
-    private static final Identifier SOULLESS_TEXTURE = SSEntities.texture("soul_strider/soul_strider_soulless");
-
     public SoulStriderEntityRenderer(EntityRenderDispatcher entityRenderDispatcher) {
-        super(entityRenderDispatcher, new SoulStriderEntityModel<SoulStriderEntity>(), 0.5F);
-        this.addFeature(
-            new SaddleFeatureRenderer<SoulStriderEntity, SoulStriderEntityModel<SoulStriderEntity>>(
-                this,
-                new SoulStriderEntityModel<SoulStriderEntity>(),
-                SSEntities.texture("soul_strider/soul_strider_saddle")
-            )
-        );
+        super(entityRenderDispatcher, new SoulStriderEntityModel<>(), 0.5F);
+        this.addFeature(new SaddleFeatureRenderer<>(this, new SoulStriderEntityModel<>(), SSEntities.texture("soul_strider/soul_strider_saddle")));
     }
 
     @Override
     public Identifier getTexture(SoulStriderEntity entity) {
-        return !entity.isSoulSurrounded() ? SOULLESS_TEXTURE : TEXTURE;
+        return !entity.isSoulSurrounded() ? SSEntities.texture("soul_strider/soul_strider_soulless") : SSEntities.texture("soul_strider/soul_strider");
     }
 
     @Override

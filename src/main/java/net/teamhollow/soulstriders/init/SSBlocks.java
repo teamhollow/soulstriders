@@ -1,18 +1,19 @@
 package net.teamhollow.soulstriders.init;
 
+import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.Block;
+import net.minecraft.block.Material;
+import net.minecraft.block.MaterialColor;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
+import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import net.teamhollow.soulstriders.SoulStriders;
-import net.teamhollow.soulstriders.block.*;
+import net.teamhollow.soulstriders.block.SoulStriderBulbBlock;
 
 public class SSBlocks {
-    public static final Block SOUL_STRIDER_BULB = register(
-        "soul_strider_bulb",
-        new SoulStriderBulbBlock()
-    );
+    public static final Block SOUL_STRIDER_BULB = register(SoulStriderBulbBlock.id, new SoulStriderBulbBlock(FabricBlockSettings.of(Material.STONE, MaterialColor.STONE).ticksRandomly().strength(0.5F).nonOpaque().sounds(BlockSoundGroup.STONE)));
 
     public SSBlocks() {}
 

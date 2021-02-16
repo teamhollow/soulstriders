@@ -29,7 +29,7 @@ public class SSEntities {
                     .add(EntityAttributes.GENERIC_FOLLOW_RANGE, 16.0D)
             )
             .spawnRestriction(SpawnRestriction.Location.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, SoulStriderEntity::canSpawn),
-        SoulStriderEntity.spawnEggColors
+        new int[]{ 5065037, 9433559 }
     );
     public static final EntityType<WispEntity> WISP = register(
         WispEntity.id,
@@ -44,7 +44,7 @@ public class SSEntities {
                 () -> MobEntity.createMobAttributes()
                     .add(EntityAttributes.GENERIC_MAX_HEALTH, 6.0D)
             ),
-        WispEntity.spawnEggColors
+        new int[]{ 4547222, 9433559 }
     );
     public static final EntityType<SoulMothEntity> SOUL_MOTH = register(
         SoulMothEntity.id,
@@ -59,7 +59,7 @@ public class SSEntities {
                     .add(EntityAttributes.GENERIC_MAX_HEALTH, 1.0D)
             )
             .spawnRestriction(SpawnRestriction.Location.NO_RESTRICTIONS, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, SoulMothEntity::canMobSpawn),
-        SoulMothEntity.spawnEggColors
+        new int[]{ 99999999, 9433559 }
     );
 
     public SSEntities() {}
@@ -67,9 +67,9 @@ public class SSEntities {
     private static <T extends Entity> EntityType<T> register(String id, FabricEntityTypeBuilder<T> entityType, int[] spawnEggColors) {
         EntityType<T> builtEntityType = entityType.build();
 
-        if (spawnEggColors[0] != 0)
-            SSItems.register(id + "_spawn_egg", new SpawnEggItem(builtEntityType, spawnEggColors[0], spawnEggColors[1],
-                    new Item.Settings().maxCount(64).group(SoulStriders.ITEM_GROUP)));
+        if (spawnEggColors != null) {
+            Registry.register(Registry.ITEM, id + "_spawn_egg", new SpawnEggItem(builtEntityType, spawnEggColors[0], spawnEggColors[1], new Item.Settings().maxCount(64).group(SoulStriders.ITEM_GROUP)));
+        }
 
         return Registry.register(Registry.ENTITY_TYPE, new Identifier(SoulStriders.MOD_ID, id), builtEntityType);
     }

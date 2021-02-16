@@ -1,50 +1,15 @@
 package net.teamhollow.soulstriders.entity.soul_strider;
 
-import java.util.EnumSet;
-import java.util.Iterator;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Random;
-import java.util.Set;
-import java.util.function.Consumer;
-
 import com.google.common.collect.Sets;
-import com.google.common.collect.UnmodifiableIterator;
-
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.entity.Dismounting;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityData;
-import net.minecraft.entity.EntityDimensions;
-import net.minecraft.entity.EntityPose;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.ExperienceOrbEntity;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.entity.ItemSteerable;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.Saddleable;
-import net.minecraft.entity.SaddledComponent;
-import net.minecraft.entity.Shearable;
-import net.minecraft.entity.SpawnGroup;
-import net.minecraft.entity.SpawnReason;
+import net.minecraft.entity.*;
 import net.minecraft.entity.ai.TargetPredicate;
-import net.minecraft.entity.ai.goal.AnimalMateGoal;
-import net.minecraft.entity.ai.goal.EscapeDangerGoal;
-import net.minecraft.entity.ai.goal.FollowParentGoal;
-import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.entity.ai.goal.LookAroundGoal;
-import net.minecraft.entity.ai.goal.TemptGoal;
-import net.minecraft.entity.ai.goal.WanderAroundGoal;
-import net.minecraft.entity.ai.pathing.EntityNavigation;
-import net.minecraft.entity.ai.pathing.LandPathNodeMaker;
-import net.minecraft.entity.ai.pathing.MobNavigation;
-import net.minecraft.entity.ai.pathing.PathNodeNavigator;
-import net.minecraft.entity.ai.pathing.PathNodeType;
+import net.minecraft.entity.ai.goal.*;
+import net.minecraft.entity.ai.pathing.*;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
@@ -72,30 +37,19 @@ import net.minecraft.tag.BlockTags;
 import net.minecraft.tag.FluidTags;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.GameRules;
-import net.minecraft.world.LocalDifficulty;
-import net.minecraft.world.ServerWorldAccess;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
-import net.minecraft.world.WorldView;
+import net.minecraft.util.math.*;
+import net.minecraft.world.*;
 import net.minecraft.world.biome.BiomeKeys;
 import net.teamhollow.soulstriders.entity.soul_moth.SoulMothEntity;
 import net.teamhollow.soulstriders.init.SSBlocks;
 import net.teamhollow.soulstriders.init.SSEntities;
 import net.teamhollow.soulstriders.init.SSItems;
 
+import java.util.*;
+import java.util.function.Consumer;
+
 public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Saddleable, Shearable {
     public static final String id = "soul_strider";
-    public static final EntityType.Builder<SoulStriderEntity> builder = EntityType.Builder
-        .create(SoulStriderEntity::new, SpawnGroup.CREATURE)
-        .setDimensions(0.9F, 1.7F)
-        .maxTrackingRange(10);
-    public static final int[] spawnEggColors = { 5065037, 9433559 };
 
     private static final Ingredient BREEDING_INGREDIENT = Ingredient.ofItems(SSItems.SOUL_MOTH_IN_A_BOTTLE);
     private static final Ingredient ATTRACTING_INGREDIENT = Ingredient.ofItems(SSItems.SOUL_MOTH_IN_A_BOTTLE, SSItems.SOUL_MOTH_ON_A_STICK);
@@ -119,6 +73,7 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
         this.setPathfindingPenalty(PathNodeType.DAMAGE_FIRE, -1.0F);
     }
 
+    @SuppressWarnings("unused")
     public static boolean canSpawn(EntityType<SoulStriderEntity> type, WorldAccess worldAccess, SpawnReason spawnReason, BlockPos blockPos, Random random) {
         BlockPos.Mutable mutable = blockPos.mutableCopy();
 
@@ -177,7 +132,7 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
     public void saddle(SoundCategory sound) {
         this.saddledComponent.setSaddled(true);
         if (sound != null) {
-            this.world.playSoundFromEntity((PlayerEntity) null, this, SoundEvents.ENTITY_STRIDER_SADDLE, sound, 0.5F, 1.0F);
+            this.world.playSoundFromEntity(null, this, SoundEvents.ENTITY_STRIDER_SADDLE, sound, 0.5F, 1.0F);
         }
 
     }
@@ -239,30 +194,28 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
 
     @Override
     public Entity getPrimaryPassenger() {
-        return this.getPassengerList().isEmpty() ? null : (Entity) this.getPassengerList().get(0);
+        return this.getPassengerList().isEmpty() ? null : this.getPassengerList().get(0);
     }
 
     @Override
     public Vec3d updatePassengerForDismount(LivingEntity passenger) {
         Vec3d[] possibleDismounts = new Vec3d[] {
-                getPassengerDismountOffset((double) this.getWidth(), (double) passenger.getWidth(), passenger.yaw),
-                getPassengerDismountOffset((double) this.getWidth(), (double) passenger.getWidth(),
+                getPassengerDismountOffset(this.getWidth(), passenger.getWidth(), passenger.yaw),
+                getPassengerDismountOffset(this.getWidth(), passenger.getWidth(),
                         passenger.yaw - 22.5F),
-                getPassengerDismountOffset((double) this.getWidth(), (double) passenger.getWidth(),
+                getPassengerDismountOffset(this.getWidth(), passenger.getWidth(),
                         passenger.yaw + 22.5F),
-                getPassengerDismountOffset((double) this.getWidth(), (double) passenger.getWidth(),
+                getPassengerDismountOffset(this.getWidth(), passenger.getWidth(),
                         passenger.yaw - 45.0F),
-                getPassengerDismountOffset((double) this.getWidth(), (double) passenger.getWidth(),
+                getPassengerDismountOffset(this.getWidth(), passenger.getWidth(),
                         passenger.yaw + 45.0F) };
         Set<BlockPos> set = Sets.newLinkedHashSet();
         double maxYBound = this.getBoundingBox().maxY;
         double minYBound = this.getBoundingBox().minY - 0.5D;
         BlockPos.Mutable mutable = new BlockPos.Mutable();
-        int possibilities = possibleDismounts.length;
 
         double y;
-        for (int i = 0; i < possibilities; i++) {
-            Vec3d vec3d = possibleDismounts[i];
+        for (Vec3d vec3d : possibleDismounts) {
             mutable.set(this.getX() + vec3d.x, maxYBound, this.getZ() + vec3d.z);
 
             for (y = maxYBound; y > minYBound; y--) {
@@ -280,13 +233,10 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
                     return new Vec3d(this.getX(), this.getBoundingBox().maxY, this.getZ());
                 }
 
-                blockPos = (BlockPos) posIter.next();
+                blockPos = posIter.next();
             } while (this.world.getFluidState(blockPos).isIn(FluidTags.LAVA));
 
-            UnmodifiableIterator<EntityPose> poseIter = passenger.getPoses().iterator();
-
-            while (poseIter.hasNext()) {
-                EntityPose entityPose = (EntityPose) poseIter.next();
+            for (EntityPose entityPose : passenger.getPoses()) {
                 y = this.world.getDismountHeight(blockPos);
                 if (Dismounting.canDismountInBlock(y)) {
                     Box box = passenger.getBoundingBox(entityPose);
@@ -523,16 +473,14 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
                 if (playerHoldingShears) {
                     if (!this.world.isClient && this.isShearable()) {
                         this.sheared(SoundCategory.PLAYERS);
-                        handStack.damage(1, (LivingEntity) player, (Consumer<LivingEntity>) ((playerEntity) -> {
-                            playerEntity.sendToolBreakStatus(hand);
-                        }));
+                        handStack.damage(1, player, (Consumer<LivingEntity>) ((playerEntity) -> playerEntity.sendToolBreakStatus(hand)));
 
                         return ActionResult.SUCCESS;
                     } else
                         return ActionResult.CONSUME;
                 }
 
-                return handStack.getItem() == Items.SADDLE || playerHoldingShears ? handStack.useOnEntity(player, this, hand) : ActionResult.PASS;
+                return handStack.getItem() == Items.SADDLE ? handStack.useOnEntity(player, this, hand) : ActionResult.PASS;
             } else if (!this.world.isClient) {
                 if (playerHoldingBreedingItem && !this.isSilent()) {
                     this.world.playSound(player, this.getX(), this.getY(), this.getZ(), SoundEvents.ENTITY_STRIDER_EAT, this.getSoundCategory(), 1.0F, 1.0F + (this.random.nextFloat() - this.random.nextFloat()) * 0.2F);
@@ -549,33 +497,33 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
     @Override
     @Environment(EnvType.CLIENT)
     public Vec3d method_29919() {
-        return new Vec3d(0.0D, (double) (0.6F * this.getStandingEyeHeight()), (double) (this.getWidth() * 0.4F));
+        return new Vec3d(0.0D, 0.6F * this.getStandingEyeHeight(), this.getWidth() * 0.4F);
     }
 
     @Override
     public EntityData initialize(ServerWorldAccess world, LocalDifficulty difficulty, SpawnReason spawnReason, EntityData entityData, CompoundTag entityTag) {
-        if (this.isBaby()) {
-            return super.initialize(world, difficulty, spawnReason, entityData, entityTag);
-        } else {
+        if (!this.isBaby()) {
             if (this.random.nextInt(30) == 0) {
-                MobEntity mobEntity = (MobEntity) EntityType.ZOMBIFIED_PIGLIN.create(world.toServerWorld());
+                MobEntity mobEntity = EntityType.ZOMBIFIED_PIGLIN.create(world.toServerWorld());
+                assert mobEntity != null;
                 entityData = this.method_30336(world, difficulty, mobEntity, new ZombieEntity.ZombieData(ZombieEntity.method_29936(this.random), false));
                 mobEntity.equipStack(EquipmentSlot.MAINHAND, new ItemStack(Items.WARPED_FUNGUS_ON_A_STICK));
-                this.saddle((SoundCategory) null);
+                this.saddle(null);
             } else if (this.random.nextInt(10) == 0) {
-                PassiveEntity passiveEntity = (PassiveEntity) SSEntities.SOUL_STRIDER.create(world.toServerWorld());
+                PassiveEntity passiveEntity = SSEntities.SOUL_STRIDER.create(world.toServerWorld());
+                assert passiveEntity != null;
                 passiveEntity.setBreedingAge(-24000);
-                entityData = this.method_30336(world, difficulty, passiveEntity, (EntityData) null);
+                entityData = this.method_30336(world, difficulty, passiveEntity, null);
             } else {
-                entityData = new PassiveEntity.PassiveData(0.5F);
+                entityData = new PassiveData(0.5F);
             }
 
-            return super.initialize(world, difficulty, spawnReason, (EntityData) entityData, entityTag);
         }
+        return super.initialize(world, difficulty, spawnReason, entityData, entityTag);
     }
     private EntityData method_30336(ServerWorldAccess serverWorldAccess, LocalDifficulty localDifficulty, MobEntity mobEntity, EntityData entityData) {
         mobEntity.refreshPositionAndAngles(this.getX(), this.getY(), this.getZ(), this.yaw, 0.0F);
-        mobEntity.initialize(serverWorldAccess, localDifficulty, SpawnReason.JOCKEY, entityData, (CompoundTag) null);
+        mobEntity.initialize(serverWorldAccess, localDifficulty, SpawnReason.JOCKEY, entityData, null);
         mobEntity.startRiding(this, true);
         return new PassiveEntity.PassiveData(0.0F);
     }
@@ -593,7 +541,7 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
 
         @Override
         protected boolean canWalkOnPath(PathNodeType pathType) {
-            return !(pathType != PathNodeType.LAVA && pathType != PathNodeType.DAMAGE_FIRE && pathType != PathNodeType.DANGER_FIRE) ? super.canWalkOnPath(pathType) : true;
+            return pathType != PathNodeType.LAVA && pathType != PathNodeType.DAMAGE_FIRE && pathType != PathNodeType.DANGER_FIRE || super.canWalkOnPath(pathType);
         }
 
         @Override
@@ -607,7 +555,7 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
         return null;
     }
 
-    class LookAtEntityGoal extends Goal {
+    static class LookAtEntityGoal extends Goal {
         protected final MobEntity mob;
         protected Entity target;
         protected final float range;
@@ -622,15 +570,14 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
             this.chance = chance;
             this.setControls(EnumSet.of(Goal.Control.LOOK));
             if (targetType == PlayerEntity.class) {
-                this.targetPredicate = (new TargetPredicate()).setBaseMaxDistance((double) range).includeTeammates().includeInvulnerable().ignoreEntityTargetRules().setPredicate((livingEntity) -> {
-                            return EntityPredicates.rides(mob).test(livingEntity);
-                        });
+                this.targetPredicate = (new TargetPredicate()).setBaseMaxDistance(range).includeTeammates().includeInvulnerable().ignoreEntityTargetRules().setPredicate((livingEntity) -> EntityPredicates.rides(mob).test(livingEntity));
             } else {
-                this.targetPredicate = (new TargetPredicate()).setBaseMaxDistance((double) range).includeTeammates().includeInvulnerable().ignoreEntityTargetRules();
+                this.targetPredicate = (new TargetPredicate()).setBaseMaxDistance(range).includeTeammates().includeInvulnerable().ignoreEntityTargetRules();
             }
 
         }
 
+        @Override
         public boolean canStart() {
             SoulStriderEntity mob = (SoulStriderEntity)this.mob;
             this.targetType = mob.isHiding() ? SoulMothEntity.class : (mob.random.nextInt(5) == 0 ? PlayerEntity.class : SoulStriderEntity.class);
@@ -648,13 +595,14 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
                 } else {
                     this.target = this.mob.world.getClosestEntityIncludingUngeneratedChunks(this.targetType,
                             this.targetPredicate, this.mob, this.mob.getX(), this.mob.getEyeY(), this.mob.getZ(),
-                            this.mob.getBoundingBox().expand((double) this.range, 3.0D, (double) this.range));
+                            this.mob.getBoundingBox().expand(this.range, 3.0D, this.range));
                 }
 
                 return this.target != null;
             }
         }
 
+        @Override
         public boolean shouldContinue() {
             if (!this.target.isAlive()) {
                 return false;
@@ -665,14 +613,17 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
             }
         }
 
+        @Override
         public void start() {
             this.lookTime = 40 + this.mob.getRandom().nextInt(40);
         }
 
+        @Override
         public void stop() {
             this.target = null;
         }
 
+        @Override
         public void tick() {
             this.mob.getLookControl().lookAt(this.target.getX(), this.target.getEyeY(), this.target.getZ());
             --this.lookTime;
@@ -711,7 +662,7 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
         }
     }
 
-    class EscapePlayersGoal extends EscapeDangerGoal {
+    static class EscapePlayersGoal extends EscapeDangerGoal {
         public EscapePlayersGoal(PathAwareEntity mob, double speed) {
             super(mob, speed);
         }
@@ -724,9 +675,7 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
                     .includeTeammates()
                     .includeInvulnerable()
                     .ignoreEntityTargetRules()
-                    .setPredicate((livingEntity) -> {
-                        return EntityPredicates.rides(mob).test(livingEntity);
-                    }), this.mob, this.mob.getX(), this.mob.getEyeY(), this.mob.getZ()) == null && !mob.isOnFire()) {
+                    .setPredicate((livingEntity) -> EntityPredicates.rides(mob).test(livingEntity)), this.mob, this.mob.getX(), this.mob.getEyeY(), this.mob.getZ()) == null && !mob.isOnFire()) {
                 return false;
             } else {
                 if (mob.isOnFire()) {
@@ -746,7 +695,7 @@ public class SoulStriderEntity extends AnimalEntity implements ItemSteerable, Sa
 
     @Override
     public void sheared(SoundCategory shearedSoundCategory) {
-        this.world.playSoundFromEntity((PlayerEntity) null, this, SoundEvents.ENTITY_SHEEP_SHEAR, shearedSoundCategory, 1.0F, 1.0F);
+        this.world.playSoundFromEntity(null, this, SoundEvents.ENTITY_SHEEP_SHEAR, shearedSoundCategory, 1.0F, 1.0F);
 
         this.setNoBulbTicks(6000);
         this.setBreedingAge(6000);
