@@ -1,16 +1,6 @@
 package net.teamhollow.soulstriders.block;
 
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Random;
-
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.Material;
-import net.minecraft.block.MaterialColor;
-import net.minecraft.block.ShapeContext;
-import net.minecraft.block.Waterloggable;
+import net.minecraft.block.*;
 import net.minecraft.entity.ai.pathing.NavigationType;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
@@ -35,6 +25,11 @@ import net.teamhollow.soulstriders.entity.wisp.WispEntity;
 import net.teamhollow.soulstriders.init.SSEntities;
 import net.teamhollow.soulstriders.state.property.SSProperties;
 
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Random;
+
+@SuppressWarnings("deprecation")
 public class SoulStriderBulbBlock extends Block implements Waterloggable {
     public static final String id = "soul_strider_bulb";
 
@@ -57,7 +52,7 @@ public class SoulStriderBulbBlock extends Block implements Waterloggable {
             int hatch = state.get(HATCH);
             if (hatch < 2) {
                 world.playSound(null, pos, SoundEvents.ENTITY_TURTLE_EGG_CRACK, SoundCategory.BLOCKS, 0.7F, 0.9F + random.nextFloat() * 0.2F);
-                world.setBlockState(pos, (BlockState) state.with(HATCH, hatch + 1), 2);
+                world.setBlockState(pos, state.with(HATCH, hatch + 1), 2);
             } else {
                 world.playSound(null, pos, SoundEvents.ENTITY_TURTLE_EGG_HATCH, SoundCategory.BLOCKS, 0.7F, 0.9F + random.nextFloat() * 0.2F);
                 world.removeBlock(pos, false);
@@ -65,6 +60,7 @@ public class SoulStriderBulbBlock extends Block implements Waterloggable {
                 for (int i = 0; i < state.get(BULBS); ++i) {
                     world.syncWorldEvent(2001, pos, Block.getRawIdFromState(state));
                     WispEntity wispEntity = SSEntities.WISP.create(world);
+                    assert wispEntity != null;
                     wispEntity.refreshPositionAndAngles(pos.getX() + 0.3D + i * 0.2D, pos.getY(), pos.getZ() + 0.3D, 0.0F, 0.0F);
                     world.spawnEntity(wispEntity);
                 }
@@ -79,7 +75,7 @@ public class SoulStriderBulbBlock extends Block implements Waterloggable {
             return blockState.with(BULBS, Math.min(4, blockState.get(BULBS) + 1));
         } else {
             FluidState fluidState = context.getWorld().getFluidState(context.getBlockPos());
-            return super.getPlacementState(context).with(WATERLOGGED, fluidState.getFluid() == Fluids.WATER);
+            return Objects.requireNonNull(super.getPlacementState(context)).with(WATERLOGGED, fluidState.getFluid() == Fluids.WATER);
         }
     }
 
@@ -95,7 +91,7 @@ public class SoulStriderBulbBlock extends Block implements Waterloggable {
         if (!state.canPlaceAt(world, pos)) {
             return Blocks.AIR.getDefaultState();
         } else {
-            if ((Boolean) state.get(WATERLOGGED)) {
+            if (state.get(WATERLOGGED)) {
                 world.getFluidTickScheduler().schedule(pos, Fluids.WATER, Fluids.WATER.getTickRate(world));
             }
 
@@ -105,8 +101,7 @@ public class SoulStriderBulbBlock extends Block implements Waterloggable {
 
     @Override
     public boolean canReplace(BlockState state, ItemPlacementContext context) {
-        return context.getStack().getItem() == this.asItem() && state.get(BULBS) < 4 ? true
-                : super.canReplace(state, context);
+        return context.getStack().getItem() == this.asItem() && state.get(BULBS) < 4 || super.canReplace(state, context);
     }
 
     @Override
@@ -126,7 +121,7 @@ public class SoulStriderBulbBlock extends Block implements Waterloggable {
 
     @Override
     public FluidState getFluidState(BlockState state) {
-        return (Boolean) state.get(WATERLOGGED) ? Fluids.WATER.getStill(false) : super.getFluidState(state);
+        return state.get(WATERLOGGED) ? Fluids.WATER.getStill(false) : super.getFluidState(state);
     }
 
     @Override

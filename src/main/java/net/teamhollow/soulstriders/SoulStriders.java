@@ -5,17 +5,18 @@ import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
-import net.teamhollow.soulstriders.init.*;
-
+import net.teamhollow.soulstriders.init.SSBlocks;
+import net.teamhollow.soulstriders.init.SSEntities;
+import net.teamhollow.soulstriders.init.SSItems;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class SoulStriders implements ModInitializer {
-    public static Logger LOGGER = LogManager.getLogger();
-
     public static final String MOD_ID = "soulstriders";
     public static final String MOD_NAME = "Soul Striders";
+
+    public static Logger LOGGER = LogManager.getLogger(MOD_ID);
 
     public static final ItemGroup ITEM_GROUP = FabricItemGroupBuilder.build(
         new Identifier(MOD_ID, "item_group"),

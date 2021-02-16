@@ -1,37 +1,37 @@
 {
-    "schemaVersion": 1,
-    "license": "MIT",
-    "id": "soulstriders",
-    "version": "${version}",
+  "schemaVersion": 1,
+  "license": "MIT",
+  "id": "soulstriders",
+  "version": "${version}",
 
-    "name": "Soul Striders",
-    "description": "Striders that stride over souls",
-    "icon": "pack.png",
+  "name": "Soul Striders",
+  "description": "Striders that stride over souls",
+  "icon": "pack.png",
 
-    "authors": [
-        "Team Hollow"
+  "authors": [
+    "Team Hollow"
+  ],
+  "contributors": [],
+  "contact": {
+    "homepage": "https://soulstriders.teamhollow.net",
+    "sources": "https://github.com/teamhollow/soulstriders",
+    "issues": "https://github.com/teamhollow/soulstriders/issues"
+  },
+
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "net.teamhollow.soulstriders.SoulStriders"
     ],
-    "contributors": [],
-    "contact": {
-        "homepage": "https://soulstriders.teamhollow.net",
-        "sources": "https://github.com/teamhollow/soulstriders",
-        "issues": "https://github.com/teamhollow/soulstriders/issues"
-    },
-
-    "environment": "*",
-    "entrypoints": {
-        "main": [
-            "net.teamhollow.soulstriders.SoulStriders"
-        ],
-        "client": [
-            "net.teamhollow.soulstriders.SoulStridersClient"
-        ],
-        "server": []
-    },
-    "mixins": [],
-    "depends": {
-        "fabricloader": ">=0.10.0",
-        "fabric": "*",
-        "minecraft": ">=1.16.2"
-    }
+    "client": [
+      "net.teamhollow.soulstriders.SoulStridersClient"
+    ],
+    "server": []
+  },
+  "mixins": [],
+  "depends": {
+    "fabricloader": ">=0.11.0",
+    "fabric": ">=0.30.0",
+    "minecraft": ">=1.16.2"
+  }
 }

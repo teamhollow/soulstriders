@@ -1,8 +1,8 @@
 {
-    "pack": {
-        "pack_format": 6,
-        "description": {
-            "translate": "mod.soulstriders.description"
-        }
+  "pack": {
+    "pack_format": 6,
+    "description": {
+      "translate": "mod.soulstriders.description"
     }
+  }
 }
