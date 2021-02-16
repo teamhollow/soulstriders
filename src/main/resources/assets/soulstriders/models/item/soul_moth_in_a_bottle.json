@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "soulstriders:item/soul_moth_in_a_bottle"
+  }
+}

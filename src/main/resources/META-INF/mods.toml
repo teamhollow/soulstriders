@@ -1,22 +1,19 @@
 modLoader = "javafml"
 loaderVersion = "[36,)"
-license = "All rights reserved"
+license = "MIT"
 
 [[mods]]
 modId = "soulstriders"
 version = "${file.jarVersion}"
-displayName = "Example Mod"
+displayName = "Soul Striders"
 #updateJSONURL="https://change.me.example.invalid/updates.json"
-#displayURL="https://change.me.to.your.mods.homepage.example.invalid/"
-#logoFile="examplemod.png"
-credits = "Thanks to team hollow"
+displayURL = "https://soulstriders.teamhollow.net"
+issueTrackerURL = "https://github.com/teamhollow/soulstriders/issues"
+logoFile = "pack.png"
+credits = "Made possible by people™"
 authors = "Team Hollow"
 description = '''
-This is a long form description of the mod. You can write whatever you want here
-
-Have some lorem ipsum.
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed mollis lacinia magna. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Sed sagittis luctus odio eu tempus. Interdum et malesuada fames ac ante ipsum primis in faucibus. Pellentesque volutpat ligula eget lacus auctor sagittis. In hac habitasse platea dictumst. Nunc gravida elit vitae sem vehicula efficitur. Donec mattis ipsum et arcu lobortis, eleifend sagittis sem rutrum. Cras pharetra quam eget posuere fermentum. Sed id tincidunt justo. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+Striders that stride over souls
 '''
 
 [[dependencies.soulstriders]]

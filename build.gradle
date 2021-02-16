@@ -28,7 +28,7 @@ minecraft {
     // Simply re-run your setup task after changing the mappings to update your workspace.
     mappings channel: 'snapshot', version: '20201028-1.16.3'
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
-    
+
     // accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
     // Default run configurations.
@@ -38,7 +38,7 @@ minecraft {
             workingDirectory project.file('run')
 
             // Recommended logging data for a userdev environment
-            // The markers can be changed as needed. 
+            // The markers can be changed as needed.
             // "SCAN": For mods scan.
             // "REGISTRIES": For firing of registry events.
             // "REGISTRYDUMP": For getting the contents of all registries.
@@ -47,7 +47,7 @@ minecraft {
             // Recommended logging level for the console
             // You can set various levels here.
             // Please read: https://stackoverflow.com/questions/2031163/when-to-use-the-different-log-levels
-            property 'forge.logging.console.level', 'debug'
+            property 'forge.logging.console.level', 'info'
 
             mods {
                 examplemod {
@@ -60,7 +60,7 @@ minecraft {
             workingDirectory project.file('run')
 
             // Recommended logging data for a userdev environment
-            // The markers can be changed as needed. 
+            // The markers can be changed as needed.
             // "SCAN": For mods scan.
             // "REGISTRIES": For firing of registry events.
             // "REGISTRYDUMP": For getting the contents of all registries.
@@ -69,7 +69,7 @@ minecraft {
             // Recommended logging level for the console
             // You can set various levels here.
             // Please read: https://stackoverflow.com/questions/2031163/when-to-use-the-different-log-levels
-            property 'forge.logging.console.level', 'debug'
+            property 'forge.logging.console.level', 'info'
 
             mods {
                 examplemod {
@@ -82,7 +82,7 @@ minecraft {
             workingDirectory project.file('run')
 
             // Recommended logging data for a userdev environment
-            // The markers can be changed as needed. 
+            // The markers can be changed as needed.
             // "SCAN": For mods scan.
             // "REGISTRIES": For firing of registry events.
             // "REGISTRYDUMP": For getting the contents of all registries.
@@ -91,7 +91,7 @@ minecraft {
             // Recommended logging level for the console
             // You can set various levels here.
             // Please read: https://stackoverflow.com/questions/2031163/when-to-use-the-different-log-levels
-            property 'forge.logging.console.level', 'debug'
+            property 'forge.logging.console.level', 'info'
 
             // Specify the modid for data generation, where to output the resulting resource, and where to look for existing resources.
             args '--mod', 'examplemod', '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
@@ -151,7 +151,7 @@ jar {
 
 // Example configuration to allow publishing using the maven-publish task
 // This is the preferred method to reobfuscate your jar file
-jar.finalizedBy('reobfJar') 
+jar.finalizedBy('reobfJar')
 // However if you are in a multi-project build, dev time needs unobfed jar files, so you can delay the obfuscation until publishing by doing
 //publish.dependsOn('reobfJar')
 

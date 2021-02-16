@@ -1,0 +1,17 @@
+{
+    "mod.soulstriders.name": "Zielenrijders",
+    "mod.soulstriders.description": "Rijders die rijden over zielen",
+    "itemGroup.soulstriders.item_group": "Zielenrijders",
+
+    "entity.soulstriders.soul_strider": "Zielenrijder",
+    "entity.soulstriders.wisp": "Wisp",
+    "entity.soulstriders.soul_moth": "Zielenmot",
+
+    "item.soulstriders.soul_moth_in_a_bottle": "Zielenmot in een fles",
+    "item.soulstriders.soul_moth_on_a_stick": "Zielenmot aan een stok",
+    "item.soulstriders.soul_strider_spawn_egg": "Zielenrijderspawnei",
+    "item.soulstriders.wisp_spawn_egg": "Wispspawnei",
+    "item.soulstriders.soul_moth_spawn_egg": "Zielenmotspawnei",
+
+    "block.soulstriders.soul_strider_bulb": "Zielenrijderlichtbol"
+}

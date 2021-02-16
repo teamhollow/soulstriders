@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "# ",
+    " X"
+  ],
+  "key": {
+    "#": {
+      "item": "minecraft:fishing_rod"
+    },
+    "X": {
+      "item": "soulstriders:soul_moth_in_a_bottle"
+    }
+  },
+  "result": {
+    "item": "soulstriders:soul_moth_on_a_stick"
+  }
+}
